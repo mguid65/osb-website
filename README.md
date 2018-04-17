@@ -1,2 +1,2 @@
 # osbDB
-Database for OpenSystemBench
+Database and server files for OpenSystemBench
