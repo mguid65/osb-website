@@ -68,7 +68,7 @@ int MySQLUpload(std::vector<std::string> str) {
     cout << str[0].size();
     cout.flush();
     
-    if (str[0].empty()) {
+    if (str[0].empty()) { //Error handling for not filling out each entry
         return 1;
     }
     pstmt->setString(1, str[0]);
