@@ -60,7 +60,7 @@ int MySQLUpload(std::vector<std::string> str) {
     //cout.flush();
     /* Create a connection */
     driver = get_driver_instance();
-    con = driver->connect("tcp://127.0.0.1/leaderboard", "root", "';");
+    con = driver->connect("tcp://127.0.0.1/leaderboard", "root", "");
     /* Connect to the MySQL test database */
     //cout<<"test2";
     //cout.flush();
