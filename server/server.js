@@ -4,10 +4,10 @@ const app = express();
 const mysql = require("mysql");
 
 const pool = mysql.createPool({
-  host: "localhost",
-  user: "mwalto7",
-  password: "Computer$cience1",
-  database: "leaderboard",
+  host: process.env.HOST,
+  user: process.env.USER,
+  password: process.env.PASS,
+  database: process.env.DB,
   supportBigNumbers: true,
   waitForConnections: true,
   connectionLimit: 10
@@ -25,7 +25,7 @@ app.get("/scores", cors(), (req, res) => {
   });
 });
 
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () =>
   console.log(`Server listening at http://localhost:${PORT}/`)
 );
