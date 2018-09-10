@@ -1,9 +1,9 @@
 {
-  "name": "open-system-benchmark",
+  "name": "osb-website",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^3.0.2",
+    "@material-ui/core": "^3.0.3",
     "@material-ui/icons": "^3.0.1",
     "ajv": "^6.5.3",
     "cors": "^2.8.4",
