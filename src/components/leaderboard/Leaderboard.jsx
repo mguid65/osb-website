@@ -11,10 +11,22 @@ import {
   CircularProgress,
   TableFooter
 } from "@material-ui/core";
+import { ExpandLess, ExpandMore } from "@material-ui/icons";
 import LeaderboardHeader from "./LeaderboardHeader";
 import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
 import { sleep, getData, stableSort, getSorting } from "./data";
+
+const ScoreMetaData = ({ classes, name, time, score }) => {
+  return (
+    <TableRow className={classes}>
+      <TableCell colSpan={2} />
+      <TableCell numeric>{name}</TableCell>
+      <TableCell numeric>{time}</TableCell>
+      <TableCell numeric>{score}</TableCell>
+    </TableRow>
+  );
+};
 
 const leaderboardStyles = theme => ({
   root: {
@@ -28,13 +40,18 @@ const leaderboardStyles = theme => ({
   },
   tableWrapper: {
     overflowX: "auto"
+  },
+  row: {
+    "&:nth-of-type(odd)": {
+      backgroundColor: theme.palette.background.default
+    }
   }
 });
 
 class Leaderboard extends Component {
   state = {
-    order: "asc",
-    orderBy: "score",
+    order: "desc",
+    orderBy: "TotalScore",
     selected: [],
     data: [],
     loading: true,
@@ -44,7 +61,7 @@ class Leaderboard extends Component {
 
   componentDidMount = async () => {
     const data = await getData();
-    await sleep(5000);
+    await sleep(1000);
     this.setState({ data, loading: false });
   };
 
@@ -114,7 +131,7 @@ class Leaderboard extends Component {
             <TableBody>
               {loading ? (
                 <TableRow style={{ height: 48 * rowsPerPage }}>
-                  <TableCell colSpan={4} style={{ textAlign: "center" }}>
+                  <TableCell colSpan={5} style={{ textAlign: "center" }}>
                     <CircularProgress size={50} color="primary" />
                   </TableCell>
                 </TableRow>
@@ -125,25 +142,70 @@ class Leaderboard extends Component {
                     .map(score => {
                       const isSelected = this.isSelected(score.ID);
                       return (
-                        <TableRow
-                          hover
-                          onClick={event => this.handleClick(event, score.ID)}
-                          tabIndex={-1}
-                          key={score.ID}
-                          selected={isSelected}
-                        >
-                          <TableCell component="th" scope="row">
-                            {score.ResultAlias}
-                          </TableCell>
-                          <TableCell numeric>{score.ID}</TableCell>
-                          <TableCell numeric>{score.TotalTime}</TableCell>
-                          <TableCell numeric>{score.TotalScore}</TableCell>
-                        </TableRow>
+                        <React.Fragment key={score.ID}>
+                          <TableRow
+                            hover
+                            onClick={event => this.handleClick(event, score.ID)}
+                            role="checkbox"
+                            aria-checked={isSelected}
+                            tabIndex={-1}
+                            selected={isSelected}
+                            className={classes.row}
+                          >
+                            <TableCell padding="checkbox">
+                              {isSelected ? <ExpandLess /> : <ExpandMore />}
+                            </TableCell>
+                            <TableCell
+                              component="th"
+                              scope="row"
+                              padding="none"
+                            >
+                              {score.ResultAlias}
+                            </TableCell>
+                            <TableCell numeric>{score.ID}</TableCell>
+                            <TableCell numeric>{score.TotalTime}</TableCell>
+                            <TableCell numeric>{score.TotalScore}</TableCell>
+                          </TableRow>
+                          {isSelected && (
+                            <React.Fragment>
+                              <ScoreMetaData
+                                classes={classes.row}
+                                name="N-Body"
+                                time={score.NBodyTime}
+                                score={score.NBodyScore}
+                              />
+                              <ScoreMetaData
+                                classes={classes.row}
+                                name="PI Digits"
+                                time={score.PiDigitsTime}
+                                score={score.PiDigitsScore}
+                              />
+                              <ScoreMetaData
+                                classes={classes.row}
+                                name="Mandelbrot"
+                                time={score.MandelbrotTime}
+                                score={score.MandelbrotScore}
+                              />
+                              <ScoreMetaData
+                                classes={classes.row}
+                                name="Spectral Norm"
+                                time={score.SpectralNormTime}
+                                score={score.SpectralNormScore}
+                              />
+                              <ScoreMetaData
+                                classes={classes.row}
+                                name="Binary Trees"
+                                time={score.BinaryTreesTime}
+                                score={score.BinaryTreesScore}
+                              />
+                            </React.Fragment>
+                          )}
+                        </React.Fragment>
                       );
                     })}
                   {emptyRows > 0 && (
                     <TableRow style={{ height: 48 * emptyRows }}>
-                      <TableCell colSpan={4} />
+                      <TableCell colSpan={5} />
                     </TableRow>
                   )}
                 </React.Fragment>
@@ -152,7 +214,7 @@ class Leaderboard extends Component {
             <TableFooter>
               <TableRow>
                 <TablePagination
-                  colSpan={4}
+                  colSpan={5}
                   count={data.length}
                   rowsPerPage={rowsPerPage}
                   page={page}

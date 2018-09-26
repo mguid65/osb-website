@@ -7,12 +7,33 @@ import {
   TableSortLabel,
   Tooltip
 } from "@material-ui/core";
+import ExpandMore from "@material-ui/icons/ExpandMore";
 
 const headers = [
-  { id: "ResultAlias", numeric: false, label: "User" },
-  { id: "ID", numeric: true, label: "Rank" },
-  { id: "TotalTime", numeric: true, label: "Time (s)" },
-  { id: "TotalScore", numeric: true, label: "Score" }
+  {
+    id: "ResultAlias",
+    numeric: false,
+    disablePadding: true,
+    label: "User"
+  },
+  {
+    id: "ID",
+    numeric: true,
+    disablePadding: false,
+    label: "Rank"
+  },
+  {
+    id: "TotalTime",
+    numeric: true,
+    disablePadding: false,
+    label: "Time (s)"
+  },
+  {
+    id: "TotalScore",
+    numeric: true,
+    disablePadding: false,
+    label: "Score"
+  }
 ];
 
 class LeaderboardHeader extends Component {
@@ -27,17 +48,22 @@ class LeaderboardHeader extends Component {
     return (
       <TableHead>
         <TableRow>
+          <TableCell padding="checkbox" width={50}>
+            <Tooltip title="Expand All" position="bottom">
+              <ExpandMore />
+            </Tooltip>
+          </TableCell>
           {headers.map(header => {
             return (
               <TableCell
                 key={header.id}
                 numeric={header.numeric}
+                padding={header.disablePadding ? "none" : "default"}
                 sortDirection={orderBy === header.id ? order : false}
               >
                 <Tooltip
                   title="Sort"
                   placement={header.numeric ? "bottom-end" : "bottom-start"}
-                  enterDelay={300}
                 >
                   <TableSortLabel
                     active={orderBy === header.id}

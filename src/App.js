@@ -1,13 +1,9 @@
 import React, { Component } from "react";
-import Leaderboard from "./components/leaderboard/Leaderboard";
+import Dashboard from "./components/appbar/Navigation";
 
 class App extends Component {
   render() {
-    return (
-      <main>
-        <Leaderboard />
-      </main>
-    );
+    return <Dashboard />;
   }
 }
 
