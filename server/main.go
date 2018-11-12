@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	"github.com/mwalto7/osb-website/database"
+	"github.com/mwalto7/osb-website/server/database"
 )
 
 func main() {
