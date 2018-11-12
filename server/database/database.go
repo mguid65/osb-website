@@ -73,15 +73,13 @@ func scanResult(s rowScanner) (*Result, error) {
 
 // ListResults returns a list of results.
 func (db *mysqlDB) ListResults() ([]*Result, error) {
-	const listResultsStmt = `SELECT * FROM Results`
-
-	listResults, err := db.conn.Prepare(listResultsStmt)
+	list, err := db.conn.Prepare(`SELECT * FROM Results`)
 	if err != nil {
 		return nil, fmt.Errorf("mysql: prepare listResults: %v", err)
 	}
-	defer listResults.Close()
+	defer list.Close()
 
-	rows, err := listResults.Query()
+	rows, err := list.Query()
 	if err != nil {
 		return nil, err
 	}
@@ -98,12 +96,42 @@ func (db *mysqlDB) ListResults() ([]*Result, error) {
 	return results, nil
 }
 
-func (db *mysqlDB) ListResultsCreatedBy(id int64) ([]Result, error) {
-	panic("implement me")
+func (db *mysqlDB) ListResultsCreatedBy(id int64) ([]*Result, error) {
+	listCreatedBy, err := db.conn.Prepare(`SELECT * FROM Results WHERE UserID = ?`)
+	if err != nil {
+		return nil, fmt.Errorf("mysql: prepare listResults: %v", err)
+	}
+	defer listCreatedBy.Close()
+
+	rows, err := listCreatedBy.Query(id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var results []*Result
+	for rows.Next() {
+		result, err := scanResult(rows)
+		if err != nil {
+			return nil, fmt.Errorf("mysql: could not read row: %v", err)
+		}
+		results = append(results, result)
+	}
+	return results, nil
 }
 
 func (db *mysqlDB) GetResult(id int64) (*Result, error) {
-	panic("implement me")
+	getResult, err := db.conn.Prepare(`SELECT * FROM Results WHERE ID = ?`)
+	if err != nil {
+		return nil, fmt.Errorf("mysql: prepare listResults: %v", err)
+	}
+	defer getResult.Close()
+
+	result, err := scanResult(getResult.QueryRow(id))
+	if err != nil {
+		return nil, fmt.Errorf("mysql: could not read row: %v", err)
+	}
+	return result, nil
 }
 
 func (db *mysqlDB) AddResult(res *Result) error {

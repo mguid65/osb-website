@@ -12,7 +12,14 @@ type Result struct {
 	ID      int64
 	UserID  int64
 	SpecsID int64
-	Results []result `json:"results"`
+	Results []Score `json:"results"`
+}
+
+// Score holds the metadata for a benchmark algorithm run.
+type Score struct {
+	Name  string   `json:"name"`  // algorithm name
+	Time  duration `json:"time"`  // total elapsed time
+	Score float64  `json:"score"` // total score
 }
 
 // ResultDatabase provides thread-safe access to a database of results.
@@ -21,7 +28,7 @@ type ResultDatabase interface {
 	ListResults() ([]*Result, error)
 
 	// ListResultsCreatedBy returns a list of results created by a user with the given id.
-	ListResultsCreatedBy(id int64) ([]Result, error)
+	ListResultsCreatedBy(id int64) ([]*Result, error)
 
 	// GetUser retrieves a result by its id.
 	GetResult(id int64) (*Result, error)
@@ -34,13 +41,6 @@ type ResultDatabase interface {
 
 	// UpdateResult updates a given result.
 	UpdateResult(res *Result) error
-}
-
-// result holds the metadata for a benchmark run.
-type result struct {
-	Name  string   `json:"name"`  // algorithm name
-	Time  duration `json:"time"`  // total elapsed time
-	Score float64  `json:"score"` // total score
 }
 
 // duration wraps a time.Duration value for added json support.
