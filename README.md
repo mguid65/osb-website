@@ -7,8 +7,9 @@ Repo for the [OpenSystemBench](https://github.com/mguid65/OpenSystemBench) websi
 Run the following commands in separate terminals to run the website locally:
 
 ```
-# don't forget to replace the environment variable values with your own
-HOST=<host> PORT=<port> USER=<user> DB=<db> node server/server.js
+# run the server
+go run server/main.go
 
+# run the client
 npm start
 ```
