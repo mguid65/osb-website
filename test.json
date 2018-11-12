@@ -1,0 +1,45 @@
+{
+  "results": [
+    {
+      "name": "N-Body",
+      "time": 3695696790.000000,
+      "score": 2705.8496863320865
+    },
+    {
+      "name": "PI Digits",
+      "time": 988072849.000000,
+      "score": 10120.711251321914
+    },
+    {
+      "name": "Mandelbrot",
+      "time": 2137566859.000000,
+      "score": 4678.216242872616
+    },
+    {
+      "name": "Spectral Norm",
+      "time": 1145340098.000000,
+      "score": 8731.031086279143
+    },
+    {
+      "name": "Binary Trees",
+      "time": 2092924496.000000,
+      "score": 4778.003229028095
+    },
+    {
+      "name": "Total",
+      "time": "1000",
+      "score": 1000
+    }
+  ],
+  "specs": {
+    "vendor": "GenuineIntel",
+    "model": "Intel(R) Core(TM) i7-8750H CPU",
+    "speed": "2.20GHz",
+    "threads": "4",
+    "overclocked": "false",
+    "byte_order": "Little Endian",
+    "physical_mem": "15.513 Gb",
+    "virtual_mem": "17.513 Gb",
+    "swap_mem": "1.9999 Gb"
+  }
+}
