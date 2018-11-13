@@ -1,5 +1,31 @@
 package database
 
+import (
+	"encoding/json"
+	"strings"
+)
+
+// SpecsDatabase provides thread-safe access to a database of specs.
+type SpecsDatabase interface {
+	// ListSpecs returns a list of all specs.
+	ListSpecs() ([]*Specs, error)
+
+	// ListSpecsCreatedBy returns a list of specs created by a user with the given id.
+	ListSpecsCreatedBy(id int64) ([]*Specs, error)
+
+	// GetSpecs retrieves specs by its id.
+	GetSpecs(id int64) (Specs, error)
+
+	// AddSpecs saves the given specs.
+	AddSpecs(specs *Specs) error
+
+	// DeleteSpecs deletes the specs with the given id.
+	DeleteSpecs(id int64) error
+
+	// UpdateSpecs updates the given specs.
+	UpdateSpecs(specs *Specs) error
+}
+
 // Specs represents the Specs MySQL table.
 type Specs struct {
 	ID       int64          // specs ID
@@ -20,23 +46,23 @@ type SysInfo struct {
 	SwapMem     string `json:"swap_mem"`     // swap memory
 }
 
-// SpecsDatabase provides thread-safe access to a database of specs.
-type SpecsDatabase interface {
-	// ListSpecs returns a list of all specs.
-	ListSpecs() ([]*Specs, error)
-
-	// ListResultsCreatedBy returns a list of specs created by a user with the given id.
-	ListSpecsCreatedBy(id int64) ([]*Specs, error)
-
-	// GetUser retrieves specs by its id.
-	GetSpecs(id int64) (Specs, error)
-
-	// AddResult saves the given specs.
-	AddSpecs(specs *Specs) error
-
-	// DeleteResult deletes the specs with the given id.
-	DeleteSpecs(id int64) error
-
-	// UpdateResult updates the given specs.
-	UpdateSpecs(specs *Specs) error
+// scanSpecs returns specs from a database row.
+func scanSpecs(s rowScanner) (*Specs, error) {
+	var (
+		id       int64
+		resultID int64
+		sysInfo  string
+	)
+	if err := s.Scan(&id, &resultID, &sysInfo); err != nil {
+		return nil, err
+	}
+	specs := &Specs{
+		ID:       id,
+		ResultID: resultID,
+	}
+	err := json.NewDecoder(strings.NewReader(sysInfo)).Decode(&specs.SysInfo)
+	if err != nil {
+		return nil, err
+	}
+	return specs, nil
 }

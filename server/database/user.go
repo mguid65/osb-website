@@ -1,13 +1,5 @@
 package database
 
-// User represents the Users MySQL table.
-type User struct {
-	ID       int64  // the user ID
-	Name     string // user's username
-	Email    string // user's email
-	Password string // user's hashed password
-}
-
 // UserDatabase provides thread-safe access to a database of users.
 type UserDatabase interface {
 	// ListUsers returns a list of all users.
@@ -24,4 +16,32 @@ type UserDatabase interface {
 
 	// UpdateUser updates a given user.
 	UpdateUser(res *Result) error
+}
+
+// User represents the Users MySQL table.
+type User struct {
+	ID       int64  // user's ID
+	Name     string // user's username
+	Email    string // user's email
+	Password string // user's hashed password
+}
+
+// scanUser returns a user from a database row.
+func scanUser(s rowScanner) (*User, error) {
+	var (
+		id       int64
+		name     string
+		email    string
+		password string
+	)
+	if err := s.Scan(&id, &name, &email, &password); err != nil {
+		return nil, err
+	}
+	user := &User{
+		ID:       id,
+		Name:     name,
+		Email:    email,
+		Password: password,
+	}
+	return user, nil
 }

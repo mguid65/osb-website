@@ -4,23 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
-
-// Result holds the metadata about a result.
-type Result struct {
-	ID      int64
-	UserID  int64
-	SpecsID int64
-	Results []Score `json:"results"`
-}
-
-// Score holds the metadata for a benchmark algorithm run.
-type Score struct {
-	Name  string   `json:"name"`  // algorithm name
-	Time  duration `json:"time"`  // total elapsed time
-	Score float64  `json:"score"` // total score
-}
 
 // ResultDatabase provides thread-safe access to a database of results.
 type ResultDatabase interface {
@@ -41,6 +27,44 @@ type ResultDatabase interface {
 
 	// UpdateResult updates a given result.
 	UpdateResult(res *Result) error
+}
+
+// Result holds the metadata about a result.
+type Result struct {
+	ID      int64
+	UserID  int64
+	SpecsID int64
+	Results []Score `json:"results"`
+}
+
+// Score holds the metadata for a benchmark algorithm run.
+type Score struct {
+	Name  string   `json:"name"`  // algorithm name
+	Time  duration `json:"time"`  // total elapsed time
+	Score float64  `json:"score"` // total score
+}
+
+// scanResult returns a result from a database row.
+func scanResult(s rowScanner) (*Result, error) {
+	var (
+		id      int64
+		userID  int64
+		specsID int64
+		results string
+	)
+	if err := s.Scan(&id, &userID, &specsID, &results); err != nil {
+		return nil, err
+	}
+	result := &Result{
+		ID:      id,
+		UserID:  userID,
+		SpecsID: specsID,
+	}
+	err := json.NewDecoder(strings.NewReader(results)).Decode(&result.Results)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }
 
 // duration wraps a time.Duration value for added json support.
