@@ -149,11 +149,11 @@ func (db *MysqlDB) ListUsers() ([]*User, error) {
 	panic("implement me")
 }
 
-func (db *MysqlDB) GetUser(id int64) (*Result, error) {
+func (db *MysqlDB) GetUser(id int64) (*User, error) {
 	panic("implement me")
 }
 
-func (db *MysqlDB) AddUser(res *Result) error {
+func (db *MysqlDB) AddUser(res *User) error {
 	panic("implement me")
 }
 
@@ -161,7 +161,7 @@ func (db *MysqlDB) DeleteUser(id int64) error {
 	panic("implement me")
 }
 
-func (db *MysqlDB) UpdateUser(res *Result) error {
+func (db *MysqlDB) UpdateUser(res *User) error {
 	panic("implement me")
 }
 
