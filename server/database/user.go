@@ -6,16 +6,16 @@ type UserDatabase interface {
 	ListUsers() ([]*User, error)
 
 	// GetUser retrieves a user by its id.
-	GetUser(id int64) (*Result, error)
+	GetUser(id int64) (*User, error)
 
 	// AddUser saves a given user.
-	AddUser(res *Result) error
+	AddUser(user *User) error
 
 	// DeleteUser deletes a user with the given id.
 	DeleteUser(id int64) error
 
 	// UpdateUser updates a given user.
-	UpdateUser(res *Result) error
+	UpdateUser(user *User) error
 }
 
 // User represents the Users MySQL table.
