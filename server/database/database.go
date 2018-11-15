@@ -164,7 +164,7 @@ func (db *mysqlDB) AddResult(res *Result) error {
 		db,
 		&addResultOnce,
 		"addResult",
-		`INSERT INTO Results(user_id, specs_id, scores) VALUES(?, ?, ?)`,
+		`INSERT INTO Results(user_id, specs_id, results) VALUES(?, ?, ?)`,
 	)
 	if err != nil {
 		return err
