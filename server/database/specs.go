@@ -14,7 +14,7 @@ type SpecsDatabase interface {
 	ListSpecsCreatedBy(id int64) ([]*Specs, error)
 
 	// GetSpecs retrieves specs by its id.
-	GetSpecs(id int64) (Specs, error)
+	GetSpecs(id int64) (*Specs, error)
 
 	// AddSpecs saves the given specs.
 	AddSpecs(specs *Specs) error
