@@ -16,7 +16,7 @@ type ResultDatabase interface {
 	// ListResultsCreatedBy returns a list of results created by a user with the given id.
 	ListResultsCreatedBy(id int64) ([]*Result, error)
 
-	// GetUser retrieves a result by its id.
+	// GetResult retrieves a result by its id.
 	GetResult(id int64) (*Result, error)
 
 	// AddResult saves a given result.
