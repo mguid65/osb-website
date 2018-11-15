@@ -1,8 +1,15 @@
-# osbServer
-Server Stuff for OpenSystemBench
+# osb-website
 
-Contains DB creation script
-Listener Server
-Website PHP
-Website CSS
+Repo for the [OpenSystemBench](https://github.com/mguid65/OpenSystemBench) website.
 
+## Development
+
+Run the following commands in separate terminals to run the website locally:
+
+```
+# run the server
+go run server/main.go
+
+# run the client
+npm start
+```
