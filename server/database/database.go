@@ -1,8 +1,11 @@
 package database
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
+	"sync"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -17,13 +20,8 @@ type OSBDatabase interface {
 	Close() error
 }
 
-type MysqlDB struct {
-	conn *sql.DB
-}
-
-var _ OSBDatabase = &MysqlDB{}
-
-func NewMySQLDB(user, passwd, addr, dbName string) (OSBDatabase, error) {
+// New returns a new databse instance.
+func New(user, passwd, addr, dbName string) (OSBDatabase, error) {
 	cfg := mysql.NewConfig()
 	cfg.User = user
 	cfg.Passwd = passwd
@@ -39,22 +37,57 @@ func NewMySQLDB(user, passwd, addr, dbName string) (OSBDatabase, error) {
 		conn.Close()
 		return nil, fmt.Errorf("mysql: could not establish a good connection: %v", err)
 	}
-	return &MysqlDB{conn: conn}, nil
+	return &mysqlDB{conn: conn}, nil
 }
+
+type mysqlDB struct {
+	conn       *sql.DB
+	statements map[string]*sql.Stmt
+}
+
+// Ensure mysqlDB implements the OSBDatabse interface.
+var _ OSBDatabase = &mysqlDB{}
 
 // rowScanner is implemented by sql.Row and sql.Rows.
 type rowScanner interface {
 	Scan(dest ...interface{}) error
 }
 
-func (db *MysqlDB) ListResults() ([]*Result, error) {
-	list, err := db.conn.Prepare(`SELECT * FROM Results`)
+// newStmt ensures a statement is created, prepared, and stored only once.
+func newStmt(db *mysqlDB, once *sync.Once, name, query string) (prepared *sql.Stmt, err error) {
+	once.Do(func() {
+		if prepared, err = db.conn.Prepare(query); err == nil {
+			db.statements[name] = prepared
+		}
+	})
 	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare listResults: %v", err)
+		return nil, fmt.Errorf("db: preapre %s: %v", name, err)
 	}
-	defer list.Close()
+	stmt, ok := db.statements[name]
+	if !ok {
+		return nil, fmt.Errorf("db: %s not found", name)
+	}
+	return stmt, nil
+}
 
-	rows, err := list.Query()
+var prepListResults sync.Once
+
+// ListResults returns a list of all results.
+func (db *mysqlDB) ListResults() ([]*Result, error) {
+	listResults, err := newStmt(
+		db,
+		&prepListResults,
+		"listResults",
+		`SELECT * FROM Results`,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := listResults.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -71,14 +104,21 @@ func (db *MysqlDB) ListResults() ([]*Result, error) {
 	return results, nil
 }
 
-func (db *MysqlDB) ListResultsCreatedBy(id int64) ([]*Result, error) {
-	listCreatedBy, err := db.conn.Prepare(`SELECT * FROM Results WHERE UserID = ?`)
-	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare listResultsCreatedBy: %v", err)
-	}
-	defer listCreatedBy.Close()
+var listResultsCreatedByOnce sync.Once
 
-	rows, err := listCreatedBy.Query(id)
+// ListResultsCreatedBy returns a list of results created by a user with the given id.
+func (db *mysqlDB) ListResultsCreatedBy(id int64) ([]*Result, error) {
+	listResultsCreatedBy, err := newStmt(
+		db,
+		&listResultsCreatedByOnce,
+		"listResultsCreatedBy",
+		`SELECT * FROM Results WHERE user_id = ?`,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := listResultsCreatedBy.Query(id)
 	if err != nil {
 		return nil, err
 	}
@@ -95,12 +135,19 @@ func (db *MysqlDB) ListResultsCreatedBy(id int64) ([]*Result, error) {
 	return results, nil
 }
 
-func (db *MysqlDB) GetResult(id int64) (*Result, error) {
-	getResult, err := db.conn.Prepare(`SELECT * FROM Results WHERE ID = ?`)
+var getResultOnce sync.Once
+
+// GetResult retrieves a result by its id.
+func (db *mysqlDB) GetResult(id int64) (*Result, error) {
+	getResult, err := newStmt(
+		db,
+		&getResultOnce,
+		"getResult",
+		`SELECT * FROM Results WHERE user_id = ?`,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare getResult: %v", err)
+		return nil, err
 	}
-	defer getResult.Close()
 
 	result, err := scanResult(getResult.QueryRow(id))
 	if err != nil {
@@ -109,37 +156,61 @@ func (db *MysqlDB) GetResult(id int64) (*Result, error) {
 	return result, nil
 }
 
-func (db *MysqlDB) AddResult(res *Result) error {
-	addResult, err := db.conn.Prepare(`INSERT INTO Results(user_id, specs_id, scores) VALUES(?, ?, ?)`)
+var addResultOnce sync.Once
+
+// AddResult saves a given result.
+func (db *mysqlDB) AddResult(res *Result) error {
+	addResult, err := newStmt(
+		db,
+		&addResultOnce,
+		"addResult",
+		`INSERT INTO Results(user_id, specs_id, scores) VALUES(?, ?, ?)`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare addResult: %v", err)
+		return err
 	}
 
 	_, err = addResult.Exec(res.UserID, res.SpecsID, res.Results)
 	return err
 }
 
-func (db *MysqlDB) DeleteResult(id int64) error {
-	deleteResult, err := db.conn.Prepare(`DELETE FROM Results WHERE result_id = ?`)
+var deleteResultOnce sync.Once
+
+// DeleteResult deletes a result with the given id.
+func (db *mysqlDB) DeleteResult(id int64) error {
+	deleteResult, err := newStmt(
+		db,
+		&deleteResultOnce,
+		"deleteResult",
+		`DELETE FROM Results WHERE result_id = ?`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare deleteResult: %v", err)
+		return err
 	}
 
 	_, err = deleteResult.Exec(id)
 	return err
 }
 
-func (db *MysqlDB) UpdateResult(res *Result) error {
-	updateResult, err := db.conn.Prepare(`UPDATE Results SET result = ? WHERE result_id = ?`)
+var updateResultOnce sync.Once
+
+// UpdateResult updates a given result.
+func (db *mysqlDB) UpdateResult(res *Result) error {
+	updateResult, err := newStmt(
+		db,
+		&updateResultOnce,
+		"updateResult",
+		`UPDATE Results SET result = ? WHERE result_id = ?`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare updateResult: %v", err)
+		return err
 	}
 
 	_, err = updateResult.Exec(res.Results, res.ID)
 	return err
 }
 
-func (db *MysqlDB) ListSpecs() ([]*Specs, error) {
+func (db *mysqlDB) ListSpecs() ([]*Specs, error) {
 	listSpecs, err := db.conn.Prepare(`SELECT * FROM Specs`)
 	if err != nil {
 		return nil, fmt.Errorf("mysql: prepare listSpecs: %v", err)
@@ -163,7 +234,7 @@ func (db *MysqlDB) ListSpecs() ([]*Specs, error) {
 	return specs, nil
 }
 
-func (db *MysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
+func (db *mysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
 	listSpecs, err := db.conn.Prepare(`SELECT * FROM Specs WHERE specs_id = ?`)
 	if err != nil {
 		return nil, fmt.Errorf("mysql: prepare listSpecs: %v", err)
@@ -187,7 +258,7 @@ func (db *MysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
 	return specs, nil
 }
 
-func (db *MysqlDB) GetSpecs(id int64) (*Specs, error) {
+func (db *mysqlDB) GetSpecs(id int64) (*Specs, error) {
 	getSpecs, err := db.conn.Prepare(`SELECT * FROM Specs WHERE specs_id = ?`)
 	if err != nil {
 		return nil, fmt.Errorf("mysql: prepare getSpecs: %v", err)
@@ -202,7 +273,7 @@ func (db *MysqlDB) GetSpecs(id int64) (*Specs, error) {
 
 }
 
-func (db *MysqlDB) AddSpecs(specs *Specs) error {
+func (db *mysqlDB) AddSpecs(specs *Specs) error {
 	addSpecs, err := db.conn.Prepare(`INSERT INTO Specs(result_id, sys_info) VALUES(?, ?)`)
 	if err != nil {
 		return fmt.Errorf("mysql: prepare addSpecs: %v", err)
@@ -212,7 +283,7 @@ func (db *MysqlDB) AddSpecs(specs *Specs) error {
 	return err
 }
 
-func (db *MysqlDB) DeleteSpecs(id int64) error {
+func (db *mysqlDB) DeleteSpecs(id int64) error {
 	deleteSpecs, err := db.conn.Prepare(`DELETE FROM Specs WHERE specs_id = ?`)
 	if err != nil {
 		return fmt.Errorf("mysql: prepare deleteSpecs: %v", err)
@@ -222,7 +293,7 @@ func (db *MysqlDB) DeleteSpecs(id int64) error {
 	return err
 }
 
-func (db *MysqlDB) UpdateSpecs(specs *Specs) error {
+func (db *mysqlDB) UpdateSpecs(specs *Specs) error {
 	updateSpecs, err := db.conn.Prepare(`UPDATE Specs SET sys_info = ? WHERE specs_id = ?`)
 	if err != nil {
 		return fmt.Errorf("mysql: prepare updateSpecs: %v", err)
@@ -232,7 +303,7 @@ func (db *MysqlDB) UpdateSpecs(specs *Specs) error {
 	return err
 }
 
-func (db *MysqlDB) ListUsers() ([]*User, error) {
+func (db *mysqlDB) ListUsers() ([]*User, error) {
 	listUsers, err := db.conn.Prepare(`SELECT * FROM Users`)
 	if err != nil {
 		return nil, fmt.Errorf("mysql: prepare listUsers: %v", err)
@@ -256,7 +327,7 @@ func (db *MysqlDB) ListUsers() ([]*User, error) {
 	return users, nil
 }
 
-func (db *MysqlDB) GetUser(id int64) (*User, error) {
+func (db *mysqlDB) GetUser(id int64) (*User, error) {
 	getUser, err := db.conn.Prepare(`SELECT * from Users WHERE user_id = ?`)
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not read row: %v", err)
@@ -270,36 +341,45 @@ func (db *MysqlDB) GetUser(id int64) (*User, error) {
 	return user, nil
 }
 
-func (db *MysqlDB) AddUser(user *User) error {
+func (db *mysqlDB) AddUser(user *User) error {
 	addUser, err := db.conn.Prepare(`INSERT INTO Users(username, email, passwd) VALUES(?, ?, ?)`)
 	if err != nil {
 		return fmt.Errorf("mysql: prepare addUser: %v", err)
 	}
 
-	_, err = addUser.Exec(user.Name, user.Email, user.Password)
-	return err
+	if _, err = addUser.Exec(user.Name, user.Email, user.Password); err != nil {
+		return fmt.Errorf("mysql: add user: %v", err)
+	}
+	return nil
 }
 
-func (db *MysqlDB) DeleteUser(id int64) error {
+func (db *mysqlDB) DeleteUser(id int64) error {
 	deleteUser, err := db.conn.Prepare(`DELETE FROM Users WHERE user_id = ?`)
 	if err != nil {
 		return fmt.Errorf("mysql: prepare deleteUser: %v", err)
 	}
 
-	_, err = deleteUser.Exec(id)
-	return err
+	if _, err = deleteUser.Exec(id); err != nil {
+		return fmt.Errorf("mysql: delete user: %v", err)
+	}
+	return nil
 }
 
-func (db *MysqlDB) UpdateUser(user *User) error {
+func (db *mysqlDB) UpdateUser(user *User) error {
 	updateUser, err := db.conn.Prepare(`UPDATE Users SET username = ?, email = ?, passwd = ? WHERE specs_id = ?`)
 	if err != nil {
 		return fmt.Errorf("mysql: prepare updateUser: %v", err)
 	}
 
-	_, err = updateUser.Exec(user.Name, user.Email, user.Password, user.ID)
-	return err
+	if _, err = updateUser.Exec(user.Name, user.Email, user.Password, user.ID); err != nil {
+		return fmt.Errorf("mysql: update user: %v", err)
+	}
+	return nil
 }
 
-func (db *MysqlDB) Close() error {
+func (db *mysqlDB) Close() error {
+	for _, stmt := range db.statements {
+		stmt.Close()
+	}
 	return db.conn.Close()
 }
