@@ -30,7 +30,7 @@ func main() {
 	}
 	fmt.Fprintln(os.Stderr)
 
-	db, err := database.NewMySQLDB(*user, string(passwd), net.JoinHostPort(*host, *port), *name)
+	db, err := database.New(*user, string(passwd), net.JoinHostPort(*host, *port), *name)
 	if err != nil {
 		log.Fatalln(err)
 	}
