@@ -48,13 +48,13 @@ func main() {
 	router.HandleFunc("/results/update/{id:[0-9]+}", handlers.UpdateResult(db))
 
 	svr := &http.Server{
-		Addr:    "127.0.0.1:8080",
+		Addr:    ":443",
 		Handler: router,
 	}
 	go func() {
-		fmt.Println("Listening on http:", svr.Addr)
+		fmt.Println("Listening on http://", svr.Addr)
 
-		if err := svr.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := svr.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}
 	}()
