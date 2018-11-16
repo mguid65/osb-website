@@ -21,7 +21,7 @@ type OSBDatabase interface {
 }
 
 // New returns a new databse instance.
-func New(user, passwd, addr, dbName string) (OSBDatabase, error) {
+func Connect(user, passwd, addr, dbName string) (OSBDatabase, error) {
 	cfg := mysql.NewConfig()
 	cfg.User = user
 	cfg.Passwd = passwd
@@ -118,7 +118,10 @@ func (db *mysqlDB) ListResultsCreatedBy(id int64) ([]*Result, error) {
 		return nil, err
 	}
 
-	rows, err := listResultsCreatedBy.Query(id)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := listResultsCreatedBy.QueryContext(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +152,10 @@ func (db *mysqlDB) GetResult(id int64) (*Result, error) {
 		return nil, err
 	}
 
-	result, err := scanResult(getResult.QueryRow(id))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	result, err := scanResult(getResult.QueryRowContext(ctx, id))
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not read row: %v", err)
 	}
@@ -170,7 +176,10 @@ func (db *mysqlDB) AddResult(res *Result) error {
 		return err
 	}
 
-	_, err = addResult.Exec(res.UserID, res.SpecsID, res.Results)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = addResult.ExecContext(ctx, res.UserID, res.SpecsID, res.Results)
 	return err
 }
 
@@ -188,7 +197,10 @@ func (db *mysqlDB) DeleteResult(id int64) error {
 		return err
 	}
 
-	_, err = deleteResult.Exec(id)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = deleteResult.ExecContext(ctx, id)
 	return err
 }
 
@@ -206,18 +218,31 @@ func (db *mysqlDB) UpdateResult(res *Result) error {
 		return err
 	}
 
-	_, err = updateResult.Exec(res.Results, res.ID)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = updateResult.ExecContext(ctx, res.Results, res.ID)
 	return err
 }
 
+var listSpecsOnce sync.Once
+
+// ListSpecs returns a list of all specs.
 func (db *mysqlDB) ListSpecs() ([]*Specs, error) {
-	listSpecs, err := db.conn.Prepare(`SELECT * FROM Specs`)
+	listSpecs, err := newStmt(
+		db,
+		&listSpecsOnce,
+		"listSpecs",
+		`SELECT * FROM Specs`,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare listSpecs: %v", err)
+		return nil, err
 	}
-	defer listSpecs.Close()
 
-	rows, err := listSpecs.Query()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := listSpecs.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -234,14 +259,24 @@ func (db *mysqlDB) ListSpecs() ([]*Specs, error) {
 	return specs, nil
 }
 
+var listSpecsCreatedByOnce sync.Once
+
+// ListSpecsCreatedBy returns a list of specs created by a user with the given id.
 func (db *mysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
-	listSpecs, err := db.conn.Prepare(`SELECT * FROM Specs WHERE specs_id = ?`)
+	listSpecsCreatedBy, err := newStmt(
+		db,
+		&listSpecsCreatedByOnce,
+		"listSpecsCreatedBy",
+		`SELECT * FROM Specs WHERE specs_id = ?`,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare listSpecs: %v", err)
+		return nil, err
 	}
-	defer listSpecs.Close()
 
-	rows, err := listSpecs.Query(id)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := listSpecsCreatedBy.QueryContext(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -258,14 +293,24 @@ func (db *mysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
 	return specs, nil
 }
 
-func (db *mysqlDB) GetSpecs(id int64) (*Specs, error) {
-	getSpecs, err := db.conn.Prepare(`SELECT * FROM Specs WHERE specs_id = ?`)
-	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare getSpecs: %v", err)
-	}
-	defer getSpecs.Close()
+var getSpecsOnce sync.Once
 
-	spec, err := scanSpecs(getSpecs.QueryRow(id))
+// GetSpecs retrieves specs by its id.
+func (db *mysqlDB) GetSpecs(id int64) (*Specs, error) {
+	getSpecs, err := newStmt(
+		db,
+		&getSpecsOnce,
+		"getSpecs",
+		`SELECT * FROM Specs WHERE specs_id = ?`,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	spec, err := scanSpecs(getSpecs.QueryRowContext(ctx, id))
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not read row: %v", err)
 	}
@@ -273,44 +318,87 @@ func (db *mysqlDB) GetSpecs(id int64) (*Specs, error) {
 
 }
 
+var addSpecsOnce sync.Once
+
+// AddSpecs saves the given specs.
 func (db *mysqlDB) AddSpecs(specs *Specs) error {
-	addSpecs, err := db.conn.Prepare(`INSERT INTO Specs(result_id, sys_info) VALUES(?, ?)`)
+	addSpecs, err := newStmt(
+		db,
+		&addSpecsOnce,
+		"addSpecs",
+		`INSERT INTO Specs(result_id, sys_info) VALUES(?, ?)`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare addSpecs: %v", err)
+		return err
 	}
 
-	_, err = addSpecs.Exec(specs.ResultID, specs.SysInfo)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = addSpecs.ExecContext(ctx, specs.ResultID, specs.SysInfo)
 	return err
 }
 
+var deleteSpecsOnce sync.Once
+
+// DeleteSpecs deletes the specs with the given id.
 func (db *mysqlDB) DeleteSpecs(id int64) error {
-	deleteSpecs, err := db.conn.Prepare(`DELETE FROM Specs WHERE specs_id = ?`)
+	deleteSpecs, err := newStmt(
+		db,
+		&deleteSpecsOnce,
+		"deleteSpecs",
+		`DELETE FROM Specs WHERE specs_id = ?`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare deleteSpecs: %v", err)
+		return err
 	}
 
-	_, err = deleteSpecs.Exec(id)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = deleteSpecs.ExecContext(ctx, id)
 	return err
 }
 
+var updateSpecsOnce sync.Once
+
+// UpdateSpecs updates the given specs.
 func (db *mysqlDB) UpdateSpecs(specs *Specs) error {
-	updateSpecs, err := db.conn.Prepare(`UPDATE Specs SET sys_info = ? WHERE specs_id = ?`)
+	updateSpecs, err := newStmt(
+		db,
+		&updateSpecsOnce,
+		"updateSpecs",
+		`UPDATE Specs SET sys_info = ? WHERE specs_id = ?`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare updateSpecs: %v", err)
+		return err
 	}
 
-	_, err = updateSpecs.Exec(specs.SysInfo, specs.ID)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = updateSpecs.ExecContext(ctx, specs.SysInfo, specs.ID)
 	return err
 }
 
-func (db *mysqlDB) ListUsers() ([]*User, error) {
-	listUsers, err := db.conn.Prepare(`SELECT * FROM Users`)
-	if err != nil {
-		return nil, fmt.Errorf("mysql: prepare listUsers: %v", err)
-	}
-	defer listUsers.Close()
+var listUsersOnce sync.Once
 
-	rows, err := listUsers.Query()
+// ListUsers returns a list of all users.
+func (db *mysqlDB) ListUsers() ([]*User, error) {
+	listUsers, err := newStmt(
+		db,
+		&listUsersOnce,
+		"listUsers",
+		`SELECT * FROM Users`,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	rows, err := listUsers.QueryContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -327,51 +415,118 @@ func (db *mysqlDB) ListUsers() ([]*User, error) {
 	return users, nil
 }
 
-func (db *mysqlDB) GetUser(id int64) (*User, error) {
-	getUser, err := db.conn.Prepare(`SELECT * from Users WHERE user_id = ?`)
-	if err != nil {
-		return nil, fmt.Errorf("mysql: could not read row: %v", err)
-	}
-	defer getUser.Close()
+var getUserOnce sync.Once
 
-	user, err := scanUser(getUser.QueryRow(id))
+// GetUser retrieves a user by its id.
+func (db *mysqlDB) GetUser(id int64) (*User, error) {
+	getUser, err := newStmt(
+		db,
+		&getUserOnce,
+		"getUser",
+		`SELECT * from Users WHERE user_id = ?`,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	user, err := scanUser(getUser.QueryRowContext(ctx, id))
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not read row: %v", err)
 	}
 	return user, nil
 }
 
-func (db *mysqlDB) AddUser(user *User) error {
-	addUser, err := db.conn.Prepare(`INSERT INTO Users(username, email, passwd) VALUES(?, ?, ?)`)
+var getUserByCredentialsOnce sync.Once
+
+// GetUserByCredentials returns a user with the matching username and password.
+func (db *mysqlDB) GetUserByCredentials(username, password string) (*User, error) {
+	getUserByCredentials, err := newStmt(
+		db,
+		&getUserByCredentialsOnce,
+		"getUserByCredentials",
+		``, // TODO: fill in query
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare addUser: %v", err)
+		return nil, err
 	}
 
-	if _, err = addUser.Exec(user.Name, user.Email, user.Password); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	user, err := scanUser(getUserByCredentials.QueryRowContext(ctx, username, password))
+	if err != nil {
+		return nil, fmt.Errorf("mysql: could not read row: %v", err)
+	}
+	return user, nil
+}
+
+var addUserOnce sync.Once
+
+// AddUser saves a given user.
+func (db *mysqlDB) AddUser(user *User) error {
+	addUser, err := newStmt(
+		db,
+		&addUserOnce,
+		"addUser",
+		`INSERT INTO Users(username, email, passwd) VALUES(?, ?, ?)`,
+	)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err = addUser.ExecContext(ctx, user.Name, user.Email, user.Password); err != nil {
 		return fmt.Errorf("mysql: add user: %v", err)
 	}
 	return nil
 }
 
+var deleteUserOnce sync.Once
+
+// DeleteUser deletes a user with the given id.
 func (db *mysqlDB) DeleteUser(id int64) error {
-	deleteUser, err := db.conn.Prepare(`DELETE FROM Users WHERE user_id = ?`)
+	deleteUser, err := newStmt(
+		db,
+		&deleteUserOnce,
+		"deleteUser",
+		`DELETE FROM Users WHERE user_id = ?`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare deleteUser: %v", err)
+		return err
 	}
 
-	if _, err = deleteUser.Exec(id); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err = deleteUser.ExecContext(ctx, id); err != nil {
 		return fmt.Errorf("mysql: delete user: %v", err)
 	}
 	return nil
 }
 
+var updateUserOnce sync.Once
+
+// UpdateUser updates a given user.
 func (db *mysqlDB) UpdateUser(user *User) error {
-	updateUser, err := db.conn.Prepare(`UPDATE Users SET username = ?, email = ?, passwd = ? WHERE specs_id = ?`)
+	updateUser, err := newStmt(
+		db,
+		&updateUserOnce,
+		"updateUser",
+		`UPDATE Users SET username = ?, email = ?, passwd = ? WHERE specs_id = ?`,
+	)
 	if err != nil {
-		return fmt.Errorf("mysql: prepare updateUser: %v", err)
+		return err
 	}
 
-	if _, err = updateUser.Exec(user.Name, user.Email, user.Password, user.ID); err != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if _, err = updateUser.ExecContext(ctx, user.Name, user.Email, user.Password, user.ID); err != nil {
 		return fmt.Errorf("mysql: update user: %v", err)
 	}
 	return nil
