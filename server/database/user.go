@@ -8,6 +8,9 @@ type UserDatabase interface {
 	// GetUser retrieves a user by its id.
 	GetUser(id int64) (*User, error)
 
+	// GetUserByCredentials returns a user with the matching username and password.
+	GetUserByCredentials(user, pass string) (*User, error)
+
 	// AddUser saves a given user.
 	AddUser(user *User) error
 
