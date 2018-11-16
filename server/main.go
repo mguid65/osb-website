@@ -49,7 +49,11 @@ func main() {
 			fmt.Fprintf(w, "%v\n", result)
 		}
 	})
-
+//        svr := &http.Server{Addr: ":443", Handler: handler}
+//        go func() {
+//                fmt.Println("Listening on http:", svr.Addr)
+//
+//                if err := svr.ListenAndServeTLS("path to key.pem", "path to key.key"); err != nil && err != http.ErrServerClosed {
 	svr := &http.Server{Addr: "127.0.0.1:8080", Handler: handler}
 	go func() {
 		fmt.Println("Listening on http:", svr.Addr)
