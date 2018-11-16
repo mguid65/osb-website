@@ -13,7 +13,9 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
+	"github.com/gorilla/mux"
 	"github.com/mwalto7/osb-website/server/database"
+	"github.com/mwalto7/osb-website/server/handlers"
 )
 
 func main() {
@@ -30,27 +32,25 @@ func main() {
 	}
 	fmt.Fprintln(os.Stderr)
 
-	db, err := database.New(*user, string(passwd), net.JoinHostPort(*host, *port), *name)
+	db, err := database.Connect(*user, string(passwd), net.JoinHostPort(*host, *port), *name)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer db.Close()
 
-	handler := http.NewServeMux()
+	router := mux.NewRouter()
 
-	handler.HandleFunc("/results", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Listing all users!")
+	router.HandleFunc("/results", handlers.ListResults(db))
+	router.HandleFunc("/results/user/{id:[0-9]+}", handlers.ListResultsCreatedBy(db))
+	router.HandleFunc("/results/{id:[0-9]+}", handlers.GetResult(db))
+	router.HandleFunc("/results/submit", handlers.AddResult(db))
+	router.HandleFunc("/results/delete/{id:[0-9]+}", handlers.DeleteResult(db))
+	router.HandleFunc("/results/update/{id:[0-9]+}", handlers.UpdateResult(db))
 
-		results, err := db.ListResults()
-		if err != nil {
-			fmt.Fprintln(w, err)
-		}
-		for _, result := range results {
-			fmt.Fprintf(w, "%v\n", result)
-		}
-	})
-
-	svr := &http.Server{Addr: "127.0.0.1:8080", Handler: handler}
+	svr := &http.Server{
+		Addr:    "127.0.0.1:8080",
+		Handler: router,
+	}
 	go func() {
 		fmt.Println("Listening on http:", svr.Addr)
 
