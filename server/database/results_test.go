@@ -43,7 +43,7 @@ func testResultsDB(t *testing.T, db database.ResultDatabase) {
 		t.Error(err)
 	}
 
-	if _, err := db.GetResult(result.ID); err != nil {
+	if _, err := db.GetResult(result.ID); err == nil {
 		t.Error("want non-nil error")
 	}
 }

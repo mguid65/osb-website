@@ -146,7 +146,7 @@ func (db *mysqlDB) GetResult(id int64) (*Result, error) {
 		db,
 		&getResultOnce,
 		"getResult",
-		`SELECT * FROM Results WHERE user_id = ?`,
+		`SELECT * FROM Results WHERE result_id = ?`,
 	)
 	if err != nil {
 		return nil, err
