@@ -17,13 +17,13 @@ func testUserDB(t *testing.T, db database.UserDatabase) {
 		t.Fatal(err)
 	}
 
-	user.ID = 7
+	user.ID = 8
 	user.Password = "newsupersecretpassword"
 	if err := db.UpdateUser(user); err != nil {
 		t.Error(err)
 	}
 
-	gotUser, err := db.GetUser(user.ID)
+	gotUser, err := db.GetUser(user.ID + 1)
 	if err != nil {
 		t.Error(err)
 	}
