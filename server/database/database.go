@@ -170,7 +170,7 @@ func (db *mysqlDB) AddResult(res *Result) (int64, error) {
 		db,
 		&addResultOnce,
 		"addResult",
-		`INSERT INTO Results(result_id, user_id, sores) VALUES(?, ?, ?)`,
+		`INSERT INTO Results(result_id, user_id, scores) VALUES(?, ?, ?)`,
 	)
 	if err != nil {
 		return 0, err
