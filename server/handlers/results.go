@@ -137,7 +137,7 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 			return
 		}
 
-		if err := db.AddResult(result); err != nil {
+		if _, err := db.AddResult(result); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

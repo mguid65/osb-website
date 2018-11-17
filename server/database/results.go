@@ -95,8 +95,15 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 	}
 
 	switch val := v.(type) {
-	case float64:
-		d.Duration = time.Duration(val) * time.Nanosecond
+	case int, float64:
+		duration := time.Duration(0)
+		if i, ok := val.(int); ok {
+			duration = time.Duration(i) * time.Nanosecond
+		}
+		if f, ok := val.(float64); ok {
+			duration = time.Duration(f) * time.Nanosecond
+		}
+		d.Duration = duration
 	case string:
 		parsed, err := time.ParseDuration(val)
 		if err != nil {

@@ -453,7 +453,7 @@ func (db *mysqlDB) GetUserByCredentials(username, password string) (*User, error
 		db,
 		&getUserByCredentialsOnce,
 		"getUserByCredentials",
-		``, // TODO: fill in query
+		`SELECT * FROM Users WHERE username = ? AND passwd = ?`,
 	)
 	if err != nil {
 		return nil, err
