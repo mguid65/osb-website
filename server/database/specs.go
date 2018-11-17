@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"strings"
 )
@@ -44,6 +45,16 @@ type SysInfo struct {
 	PhysicalMem string `json:"physical_mem"` // physical memory
 	VirtualMem  string `json:"virtual_mem"`  // virtual memory
 	SwapMem     string `json:"swap_mem"`     // swap memory
+}
+
+// Value implements driver.Valuer.
+func (s SysInfo) Value() (driver.Value, error) {
+	return json.Marshal(s)
+}
+
+// Scan implements sql.Scanner.
+func (s *SysInfo) Scan(value interface{}) error {
+	return json.Unmarshal(value.([]byte), *s)
 }
 
 // scanSpecs returns specs from a database row.
