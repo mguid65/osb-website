@@ -179,7 +179,7 @@ func (db *mysqlDB) AddResult(result *Result) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	r, err := addResult.ExecContext(ctx, result.UserID, result.Results)
+	r, err := addResult.ExecContext(ctx, result.UserID, result.Scores)
 	if err != nil {
 		return 0, err
 	}
@@ -215,7 +215,7 @@ func (db *mysqlDB) UpdateResult(res *Result) error {
 		db,
 		&updateResultOnce,
 		"updateResult",
-		`UPDATE Results SET result = ? WHERE result_id = ?`,
+		`UPDATE Results SET user_id = ?, scores = ? WHERE result_id = ?`,
 	)
 	if err != nil {
 		return err
@@ -224,7 +224,7 @@ func (db *mysqlDB) UpdateResult(res *Result) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = updateResult.ExecContext(ctx, res.Results, res.ID)
+	_, err = updateResult.ExecContext(ctx, res.UserID, res.Scores)
 	return err
 }
 

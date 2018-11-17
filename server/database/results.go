@@ -32,9 +32,9 @@ type ResultDatabase interface {
 
 // Result holds the metadata about a result.
 type Result struct {
-	ID      int64
-	UserID  int64
-	Results Scores `json:"results"`
+	ID     int64
+	UserID int64
+	Scores Scores `json:"results"`
 }
 
 // Score holds the metadata for a benchmark algorithm run.
@@ -68,7 +68,7 @@ func scanResult(s rowScanner) (*Result, error) {
 		ID:     id,
 		UserID: userID,
 	}
-	err := json.NewDecoder(strings.NewReader(results)).Decode(&result.Results)
+	err := json.NewDecoder(strings.NewReader(results)).Decode(&result.Scores)
 	if err != nil {
 		return nil, err
 	}
