@@ -34,7 +34,7 @@ type ResultDatabase interface {
 type Result struct {
 	ID     int64
 	UserID int64
-	Scores Scores `json:"results"`
+	Scores Scores `json:"scores"`
 }
 
 // Score holds the metadata for a benchmark algorithm run.

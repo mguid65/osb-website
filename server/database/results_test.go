@@ -9,8 +9,8 @@ import (
 
 func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	result := &database.Result{
-		UserID:  2,
-		Results: make([]database.Score, 0),
+		UserID: 2,
+		Scores: make(database.Scores, 0),
 	}
 
 	id, err := db.AddResult(result)
@@ -19,7 +19,7 @@ func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	}
 
 	result.ID = id
-	result.Results = append(result.Results, database.Score{
+	result.Scores = append(result.Scores, database.Score{
 		Name:  "Total",
 		Time:  database.Duration{Duration: 25 * time.Millisecond},
 		Score: 1000,
@@ -32,8 +32,8 @@ func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	if err != nil {
 		t.Error(err)
 	}
-	for i, got := range gotResult.Results {
-		want := result.Results[i]
+	for i, got := range gotResult.Scores {
+		want := result.Scores[i]
 		if got.Name != want.Name || got.Time.String() != want.Time.String() || got.Score != want.Score {
 			t.Errorf("Update scores: got %v, want %v", got, want)
 		}
