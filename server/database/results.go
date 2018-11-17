@@ -72,10 +72,12 @@ type Duration struct {
 	time.Duration
 }
 
+// MarshalJSON serializes a time.Duration value to JSON.
 func (d *Duration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.Duration.String())
 }
 
+// UnmarshalJSON deserializes a time.Duration value to JSON.
 func (d *Duration) UnmarshalJSON(data []byte) error {
 	var v interface{}
 	if err := json.Unmarshal(data, &v); err != nil {
