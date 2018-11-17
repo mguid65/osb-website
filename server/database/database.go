@@ -37,7 +37,7 @@ func Connect(user, passwd, addr, dbName string) (OSBDatabase, error) {
 		conn.Close()
 		return nil, fmt.Errorf("mysql: could not establish a good connection: %v", err)
 	}
-	return &mysqlDB{conn: conn}, nil
+	return &mysqlDB{conn: conn, statements: make(map[string]*sql.Stmt)}, nil
 }
 
 type mysqlDB struct {
