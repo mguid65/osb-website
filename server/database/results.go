@@ -1,6 +1,7 @@
 package database
 
 import (
+	"database/sql/driver"
 	"encoding/json"
 	"fmt"
 	"strconv"
@@ -33,7 +34,7 @@ type ResultDatabase interface {
 type Result struct {
 	ID      int64
 	UserID  int64
-	Results []Score `json:"results"`
+	Results Scores `json:"results"`
 }
 
 // Score holds the metadata for a benchmark algorithm run.
@@ -41,6 +42,16 @@ type Score struct {
 	Name  string   `json:"name"`  // algorithm name
 	Time  Duration `json:"time"`  // total elapsed time
 	Score float64  `json:"score"` // total score
+}
+
+type Scores []Score
+
+func (s Scores) Value() (driver.Value, error) {
+	return json.Marshal(s)
+}
+
+func (s *Scores) Scan(value interface{}) error {
+	return json.Unmarshal(value.([]byte), s)
 }
 
 // scanResult returns a result from a database row.
