@@ -33,7 +33,6 @@ type ResultDatabase interface {
 type Result struct {
 	ID      int64
 	UserID  int64
-	SpecsID int64
 	Results []Score `json:"results"`
 }
 
@@ -49,16 +48,14 @@ func scanResult(s rowScanner) (*Result, error) {
 	var (
 		id      int64
 		userID  int64
-		specsID int64
 		results string
 	)
-	if err := s.Scan(&id, &userID, &specsID, &results); err != nil {
+	if err := s.Scan(&id, &userID, &results); err != nil {
 		return nil, err
 	}
 	result := &Result{
-		ID:      id,
-		UserID:  userID,
-		SpecsID: specsID,
+		ID:     id,
+		UserID: userID,
 	}
 	err := json.NewDecoder(strings.NewReader(results)).Decode(&result.Results)
 	if err != nil {
