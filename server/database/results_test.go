@@ -9,8 +9,12 @@ import (
 
 func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	result := &database.Result{
-		UserID:  1,
-		Results: make([]database.Score, 0),
+		UserID: 1,
+		Results: make([]struct {
+			Name  string            `json:"name"`
+			Time  database.Duration `json:"time"`
+			Score float64           `json:"score"`
+		}, 0),
 	}
 
 	id, err := db.AddResult(result)
@@ -19,7 +23,11 @@ func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	}
 
 	result.ID = id
-	result.Results = append(result.Results, database.Score{
+	result.Results = append(result.Results, struct {
+		Name  string            `json:"name"`
+		Time  database.Duration `json:"time"`
+		Score float64           `json:"score"`
+	}{
 		Name:  "Total",
 		Time:  database.Duration{Duration: 25 * time.Millisecond},
 		Score: 1000,

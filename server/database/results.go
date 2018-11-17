@@ -33,14 +33,11 @@ type ResultDatabase interface {
 type Result struct {
 	ID      int64
 	UserID  int64
-	Results []Score `json:"results"`
-}
-
-// Score holds the metadata for a benchmark algorithm run.
-type Score struct {
-	Name  string   `json:"name"`  // algorithm name
-	Time  Duration `json:"time"`  // total elapsed time
-	Score float64  `json:"score"` // total score
+	Results []struct {
+		Name  string   `json:"name"`  // algorithm name
+		Time  Duration `json:"time"`  // total elapsed time
+		Score float64  `json:"score"` // total score
+	} `json:"results"`
 }
 
 // scanResult returns a result from a database row.
