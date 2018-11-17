@@ -146,7 +146,7 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 		log.Println("successfully submited result id", id)
 
 		specs := &database.Specs{
-			ResultID: result.ID,
+			ResultID: id,
 			SysInfo:  submission.SysInfo,
 		}
 		id, err = db.AddSpecs(specs)
