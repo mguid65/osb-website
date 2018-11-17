@@ -43,12 +43,15 @@ type Score struct {
 	Score float64  `json:"score"` // total score
 }
 
+// Scores implements driver.Valuer and sql.Scanner.
 type Scores []Score
 
+// Value returns a driver.Value for a slice of scores.
 func (s Scores) Value() (driver.Value, error) {
 	return json.Marshal(s)
 }
 
+// Scan scans a slice of scores from the database.
 func (s *Scores) Scan(value interface{}) error {
 	return json.Unmarshal(value.([]byte), *s)
 }

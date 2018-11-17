@@ -37,5 +37,5 @@ func TestMySQLDB(t *testing.T) {
 
 	testUserDB(t, db)
 	testResultsDB(t, db)
-	// testSpecsDB(t, db)
+	testSpecsDB(t, db)
 }
