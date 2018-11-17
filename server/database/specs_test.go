@@ -35,7 +35,7 @@ func testSpecsDB(t *testing.T, db database.SpecsDatabase) {
 		t.Error(err)
 	}
 
-	if _, err := db.GetSpecs(specs.ID); err != nil {
+	if _, err := db.GetSpecs(specs.ID); err == nil {
 		t.Error("want non-nil error")
 	}
 }
