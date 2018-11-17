@@ -32,7 +32,7 @@ func ListResults(db database.ResultDatabase) http.HandlerFunc {
 }
 
 // ListResultsCreatedBy returns all results created by the user with the given user ID.
-func ListResultsCreatedBy(db database.OSBDatabase) http.HandlerFunc {
+func ListResultsCreatedBy(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
@@ -69,7 +69,7 @@ func ListResultsCreatedBy(db database.OSBDatabase) http.HandlerFunc {
 }
 
 // GetResult returns the result row with the matching result id.
-func GetResult(db database.OSBDatabase) http.HandlerFunc {
+func GetResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
@@ -125,15 +125,14 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 			return
 		}
 
-		result := &database.Result{
-			UserID: user.ID,
-		}
+		var result database.Result
 		if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		id, err := db.AddResult(result)
+		result.UserID = user.ID
+		id, err := db.AddResult(&result)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -145,7 +144,7 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 }
 
 // DeleteResult deletes the result row with the matching result id.
-func DeleteResult(db database.OSBDatabase) http.HandlerFunc {
+func DeleteResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
@@ -168,7 +167,7 @@ func DeleteResult(db database.OSBDatabase) http.HandlerFunc {
 }
 
 // UpdateResult updates the result with the given values.
-func UpdateResult(db database.OSBDatabase) http.HandlerFunc {
+func UpdateResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var result *database.Result
 		// TODO: make result
