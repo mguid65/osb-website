@@ -12,10 +12,10 @@ import (
 	"time"
 
 	"golang.org/x/crypto/ssh/terminal"
-
 	"github.com/gorilla/mux"
-	"github.com/mwalto7/osb-website/server/database"
-	"github.com/mwalto7/osb-website/server/handlers"
+	
+	"github.com/mguid65/osb-website/server/database"
+	"github.com/mguid65/osb-website/server/handlers"
 )
 
 func main() {

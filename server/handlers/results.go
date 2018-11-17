@@ -6,7 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/mwalto7/osb-website/server/database"
+
+	"github.com/mguid65/osb-website/server/database"
 )
 
 // ListResults lists all results.
