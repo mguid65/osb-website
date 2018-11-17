@@ -210,7 +210,7 @@ func (db *mysqlDB) DeleteResult(id int64) error {
 var updateResultOnce sync.Once
 
 // UpdateResult updates a given result.
-func (db *mysqlDB) UpdateResult(res *Result) error {
+func (db *mysqlDB) UpdateResult(result *Result) error {
 	updateResult, err := newStmt(
 		db,
 		&updateResultOnce,
@@ -224,7 +224,7 @@ func (db *mysqlDB) UpdateResult(res *Result) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = updateResult.ExecContext(ctx, res.UserID, res.Scores, res.ID)
+	_, err = updateResult.ExecContext(ctx, result.UserID, result.Scores, result.ID)
 	return err
 }
 

@@ -51,7 +51,7 @@ func (s Scores) Value() (driver.Value, error) {
 }
 
 func (s *Scores) Scan(value interface{}) error {
-	return json.Unmarshal(value.([]byte), s)
+	return json.Unmarshal(value.([]byte), *s)
 }
 
 // scanResult returns a result from a database row.
