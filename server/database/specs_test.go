@@ -8,7 +8,7 @@ import (
 
 func testSpecsDB(t *testing.T, db database.SpecsDatabase) {
 	specs := &database.Specs{
-		ResultID: 1,
+		ResultID: 4,
 		SysInfo:  database.SysInfo{},
 	}
 
