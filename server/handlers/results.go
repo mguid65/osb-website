@@ -126,7 +126,7 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 		}
 
 		var result database.Result
-		if err := json.NewDecoder(r.Body).Decode(&result); err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&result.Scores); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
