@@ -9,16 +9,17 @@ import (
 
 func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	result := &database.Result{
-		ID:      1,
 		UserID:  1,
 		SpecsID: 1,
 		Results: make([]database.Score, 0),
 	}
 
-	if err := db.AddResult(result); err != nil {
+	id, err := db.AddResult(result)
+	if err != nil {
 		t.Fatal(err)
 	}
 
+	result.ID = id
 	result.Results = append(result.Results, database.Score{
 		Name:  "Total",
 		Time:  database.Duration{Duration: 25 * time.Millisecond},

@@ -36,6 +36,6 @@ func TestMySQLDB(t *testing.T) {
 	defer db.Close()
 
 	testUserDB(t, db)
-	// testResultsDB(t, db)
+	testResultsDB(t, db)
 	// testSpecsDB(t, db)
 }

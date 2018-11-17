@@ -165,7 +165,7 @@ func (db *mysqlDB) GetResult(id int64) (*Result, error) {
 var addResultOnce sync.Once
 
 // AddResult saves a given result.
-func (db *mysqlDB) AddResult(res *Result) error {
+func (db *mysqlDB) AddResult(res *Result) (int64, error) {
 	addResult, err := newStmt(
 		db,
 		&addResultOnce,
@@ -173,14 +173,17 @@ func (db *mysqlDB) AddResult(res *Result) error {
 		`INSERT INTO Results(user_id, specs_id, results) VALUES(?, ?, ?)`,
 	)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = addResult.ExecContext(ctx, res.UserID, res.SpecsID, res.Results)
-	return err
+	r, err := addResult.ExecContext(ctx, res.UserID, res.SpecsID, res.Results)
+	if err != nil {
+		return 0, err
+	}
+	return r.LastInsertId()
 }
 
 var deleteResultOnce sync.Once
@@ -321,7 +324,7 @@ func (db *mysqlDB) GetSpecs(id int64) (*Specs, error) {
 var addSpecsOnce sync.Once
 
 // AddSpecs saves the given specs.
-func (db *mysqlDB) AddSpecs(specs *Specs) error {
+func (db *mysqlDB) AddSpecs(specs *Specs) (int64, error) {
 	addSpecs, err := newStmt(
 		db,
 		&addSpecsOnce,
@@ -329,14 +332,17 @@ func (db *mysqlDB) AddSpecs(specs *Specs) error {
 		`INSERT INTO Specs(result_id, sys_info) VALUES(?, ?)`,
 	)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err = addSpecs.ExecContext(ctx, specs.ResultID, specs.SysInfo)
-	return err
+	r, err := addSpecs.ExecContext(ctx, specs.ResultID, specs.SysInfo)
+	if err != nil {
+		return 0, err
+	}
+	return r.LastInsertId()
 }
 
 var deleteSpecsOnce sync.Once
@@ -480,11 +486,11 @@ func (db *mysqlDB) AddUser(user *User) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	res, err := addUser.ExecContext(ctx, user.Name, user.Email, user.Password)
+	r, err := addUser.ExecContext(ctx, user.Name, user.Email, user.Password)
 	if err != nil {
 		return 0, fmt.Errorf("mysql: add user: %v", err)
 	}
-	return res.LastInsertId()
+	return r.LastInsertId()
 }
 
 var deleteUserOnce sync.Once

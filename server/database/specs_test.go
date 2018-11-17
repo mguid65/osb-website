@@ -8,15 +8,16 @@ import (
 
 func testSpecsDB(t *testing.T, db database.SpecsDatabase) {
 	specs := &database.Specs{
-		ID:       1,
 		ResultID: 1,
 		SysInfo:  database.SysInfo{},
 	}
 
-	if err := db.AddSpecs(specs); err != nil {
+	id, err := db.AddSpecs(specs)
+	if err != nil {
 		t.Fatal(err)
 	}
 
+	specs.ID = id
 	specs.SysInfo.Vendor = "GenuineIntel"
 	if err := db.UpdateSpecs(specs); err != nil {
 		t.Error(err)

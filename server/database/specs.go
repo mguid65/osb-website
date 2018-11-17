@@ -17,7 +17,7 @@ type SpecsDatabase interface {
 	GetSpecs(id int64) (*Specs, error)
 
 	// AddSpecs saves the given specs.
-	AddSpecs(specs *Specs) error
+	AddSpecs(specs *Specs) (int64, error)
 
 	// DeleteSpecs deletes the specs with the given id.
 	DeleteSpecs(id int64) error

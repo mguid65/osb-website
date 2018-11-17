@@ -20,7 +20,7 @@ type ResultDatabase interface {
 	GetResult(id int64) (*Result, error)
 
 	// AddResult saves a given result.
-	AddResult(res *Result) error
+	AddResult(res *Result) (int64, error)
 
 	// DeleteResult deletes a result with the given id.
 	DeleteResult(id int64) error
