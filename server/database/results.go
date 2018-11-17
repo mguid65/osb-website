@@ -4,7 +4,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -91,19 +90,18 @@ func (d *Duration) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
-	var f float64
+
 	switch val := v.(type) {
 	case float64:
-		f = val
+		d.Duration = time.Duration(val) * time.Nanosecond
 	case string:
-		parsed, err := strconv.ParseFloat(val, 64)
+		parsed, err := time.ParseDuration(val)
 		if err != nil {
 			return err
 		}
-		f = parsed
+		d.Duration = parsed
 	default:
 		return fmt.Errorf("could not unmarshal %v: unsupported type %T", v, v)
 	}
-	d.Duration = time.Duration(f) * time.Nanosecond
 	return nil
 }
