@@ -40,7 +40,7 @@ type SysInfo struct {
 	Model       string `json:"model"`        // CPU model
 	ClockSpeed  string `json:"speed"`        // CPU clock speed
 	Threads     string `json:"threads"`      // number of physical CPU cores
-	Overclocked string `json:"overclocked"`  // specifies if the CPU is overclocked
+	Overclocked bool   `json:"overclocked"`  // specifies if the CPU is overclocked
 	ByteOrder   string `json:"byte_order"`   // CPU byte order
 	PhysicalMem string `json:"physical_mem"` // physical memory
 	VirtualMem  string `json:"virtual_mem"`  // virtual memory
