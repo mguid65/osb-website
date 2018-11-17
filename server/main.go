@@ -11,9 +11,9 @@ import (
 	"os/signal"
 	"time"
 
-	"golang.org/x/crypto/ssh/terminal"
 	"github.com/gorilla/mux"
-	
+	"golang.org/x/crypto/ssh/terminal"
+
 	"github.com/mguid65/osb-website/server/database"
 	"github.com/mguid65/osb-website/server/handlers"
 )
@@ -51,10 +51,15 @@ func main() {
 		Addr:    ":443",
 		Handler: router,
 	}
-	go func() {
-		fmt.Println("Listening on http://", svr.Addr)
 
-		if err := svr.ListenAndServeTLS("", ""); err != nil && err != http.ErrServerClosed {
+	var (
+		certFile = "/home/osbadmin/cert/key.pem"
+		keyFile  = "/home/osbadmin/cert/key.key"
+	)
+	go func() {
+		fmt.Println("Listening on https://", svr.Addr)
+
+		if err := svr.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}
 	}()

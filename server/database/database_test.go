@@ -17,7 +17,7 @@ var (
 )
 
 func init() {
-	flag.StringVar(&user, "dbuser", "mwalto7", "the database user")
+	flag.StringVar(&user, "dbuser", "", "the database user")
 	flag.StringVar(&pass, "dbpass", "", "database password")
 	flag.StringVar(&host, "dbhost", "127.0.0.1", "the database address")
 	flag.StringVar(&port, "dbport", "3306", "the database port")

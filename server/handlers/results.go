@@ -11,7 +11,7 @@ import (
 )
 
 // ListResults lists all results.
-func ListResults(db database.OSBDatabase) http.HandlerFunc {
+func ListResults(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		results, err := db.ListResults()
 		if err != nil {
