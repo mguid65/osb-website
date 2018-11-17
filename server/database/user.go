@@ -12,7 +12,7 @@ type UserDatabase interface {
 	GetUserByCredentials(user, pass string) (*User, error)
 
 	// AddUser saves a given user.
-	AddUser(user *User) error
+	AddUser(user *User) (int64, error)
 
 	// DeleteUser deletes a user with the given id.
 	DeleteUser(id int64) error

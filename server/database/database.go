@@ -466,7 +466,7 @@ func (db *mysqlDB) GetUserByCredentials(username, password string) (*User, error
 var addUserOnce sync.Once
 
 // AddUser saves a given user.
-func (db *mysqlDB) AddUser(user *User) error {
+func (db *mysqlDB) AddUser(user *User) (int64, error) {
 	addUser, err := newStmt(
 		db,
 		&addUserOnce,
@@ -474,16 +474,17 @@ func (db *mysqlDB) AddUser(user *User) error {
 		`INSERT INTO Users(username, email, passwd) VALUES(?, ?, ?)`,
 	)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if _, err = addUser.ExecContext(ctx, user.Name, user.Email, user.Password); err != nil {
-		return fmt.Errorf("mysql: add user: %v", err)
+	res, err := addUser.ExecContext(ctx, user.Name, user.Email, user.Password)
+	if err != nil {
+		return 0, fmt.Errorf("mysql: add user: %v", err)
 	}
-	return nil
+	return res.LastInsertId()
 }
 
 var deleteUserOnce sync.Once
