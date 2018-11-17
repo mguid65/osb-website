@@ -125,19 +125,36 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 			return
 		}
 
-		var result database.Result
-		if err := json.NewDecoder(r.Body).Decode(&result.Scores); err != nil {
+		submission := struct {
+			Scores  database.Scores  `json:"scores"`
+			SysInfo database.SysInfo `json:"specs"`
+		}{}
+		if err := json.NewDecoder(r.Body).Decode(&submission); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
-		result.UserID = user.ID
-		id, err := db.AddResult(&result)
+		result := &database.Result{
+			UserID: user.ID,
+			Scores: submission.Scores,
+		}
+		id, err := db.AddResult(result)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		log.Println("successfully submited result id", id)
+
+		specs := &database.Specs{
+			ResultID: result.ID,
+			SysInfo:  submission.SysInfo,
+		}
+		id, err = db.AddSpecs(specs)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println("successfully submitted specs id", id)
 
 		w.WriteHeader(http.StatusOK)
 	}
