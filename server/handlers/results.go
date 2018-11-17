@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -132,10 +133,13 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 			return
 		}
 
-		if _, err := db.AddResult(result); err != nil {
+		id, err := db.AddResult(result)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		log.Println("successfully submited result id", id)
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
