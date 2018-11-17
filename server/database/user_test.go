@@ -8,7 +8,6 @@ import (
 
 func testUserDB(t *testing.T, db database.UserDatabase) {
 	user := &database.User{
-		ID:       1,
 		Name:     "test",
 		Email:    "test@test.com",
 		Password: "supersecretpassword",
@@ -18,6 +17,7 @@ func testUserDB(t *testing.T, db database.UserDatabase) {
 		t.Fatal(err)
 	}
 
+	user.ID = 7
 	user.Password = "newsupersecretpassword"
 	if err := db.UpdateUser(user); err != nil {
 		t.Error(err)
