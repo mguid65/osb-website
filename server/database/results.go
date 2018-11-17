@@ -40,7 +40,7 @@ type Result struct {
 // Score holds the metadata for a benchmark algorithm run.
 type Score struct {
 	Name  string   `json:"name"`  // algorithm name
-	Time  duration `json:"time"`  // total elapsed time
+	Time  Duration `json:"time"`  // total elapsed time
 	Score float64  `json:"score"` // total score
 }
 
@@ -67,16 +67,16 @@ func scanResult(s rowScanner) (*Result, error) {
 	return result, nil
 }
 
-// duration wraps a time.Duration value for added json support.
-type duration struct {
+// Duration wraps a time.Duration value for added json support.
+type Duration struct {
 	time.Duration
 }
 
-func (d *duration) MarshalJSON() ([]byte, error) {
+func (d *Duration) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.Duration.String())
 }
 
-func (d *duration) UnmarshalJSON(data []byte) error {
+func (d *Duration) UnmarshalJSON(data []byte) error {
 	var v interface{}
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err

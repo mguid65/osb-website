@@ -20,7 +20,7 @@ type OSBDatabase interface {
 	Close() error
 }
 
-// New returns a new databse instance.
+// Connect establishes a tcp connection to the database.
 func Connect(user, passwd, addr, dbName string) (OSBDatabase, error) {
 	cfg := mysql.NewConfig()
 	cfg.User = user
