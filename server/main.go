@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -8,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/ssh/terminal"
@@ -45,19 +47,19 @@ func main() {
 	router.HandleFunc("/results/delete/{id:[0-9]+}", handlers.DeleteResult(db))
 	router.HandleFunc("/results/update/{id:[0-9]+}", handlers.UpdateResult(db))
 
-	// svr := &http.Server{
-	// 	Addr:    ":443",
-	// 	Handler: router,
-	// }
+	svr := &http.Server{
+		Addr:    ":443",
+		Handler: router,
+	}
 
 	var (
 		certFile = "/home/osbadmin/cert/key.pem"
 		keyFile  = "/home/osbadmin/cert/key.key"
 	)
 	go func() {
-		fmt.Println("Listening on https://localhost:443")
+		fmt.Println("Listening on https://", svr.Addr)
 
-		if err := http.ListenAndServeTLS(":443", certFile, keyFile, router); err != nil && err != http.ErrServerClosed {
+		if err := svr.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}
 	}()
@@ -70,14 +72,14 @@ func main() {
 		signal.Notify(signals, os.Interrupt, os.Kill)
 		<-signals
 
-		// ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-		// defer cancel()
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
 
-		// fmt.Fprintln(os.Stderr, " Shutting down server...")
+		fmt.Fprintln(os.Stderr, " Shutting down server...")
 
-		// if err := svr.Shutdown(ctx); err != nil {
-		// 	errc <- fmt.Errorf("could not shut down server within 30s: %v", err)
-		// }
+		if err := svr.Shutdown(ctx); err != nil {
+			errc <- fmt.Errorf("could not shut down server within 30s: %v", err)
+		}
 	}()
 
 	if err := <-errc; err != nil {
