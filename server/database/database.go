@@ -517,7 +517,7 @@ func (db *mysqlDB) UpdateUser(user *User) error {
 		db,
 		&updateUserOnce,
 		"updateUser",
-		`UPDATE Users SET username = ?, email = ?, passwd = ? WHERE specs_id = ?`,
+		`UPDATE Users SET username = ?, email = ?, passwd = ? WHERE user_id = ?`,
 	)
 	if err != nil {
 		return err
