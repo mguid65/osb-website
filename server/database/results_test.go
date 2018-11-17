@@ -10,7 +10,6 @@ import (
 func testResultsDB(t *testing.T, db database.ResultDatabase) {
 	result := &database.Result{
 		UserID:  1,
-		SpecsID: 1,
 		Results: make([]database.Score, 0),
 	}
 
