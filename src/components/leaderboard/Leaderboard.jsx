@@ -162,10 +162,9 @@ class Leaderboard extends Component {
                             >
                               {score.ResultAlias}
                             </TableCell>
-                            <TableCell>{data}</TableCell>
-                            {/* <TableCell numeric>{score.ID}</TableCell>
-                            <TableCell numeric>{score.TotalTime}</TableCell>
-                            <TableCell numeric>{score.TotalScore}</TableCell> */}
+                            <TableCell numeric>{score.name}</TableCell>
+                            <TableCell numeric>{score.time}</TableCell>
+                            <TableCell numeric>{score.score}</TableCell>
                           </TableRow>
                           {/* {isSelected && (
                             <React.Fragment>
