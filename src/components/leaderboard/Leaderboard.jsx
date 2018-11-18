@@ -162,11 +162,12 @@ class Leaderboard extends Component {
                             >
                               {score.ResultAlias}
                             </TableCell>
-                            <TableCell numeric>{score.ID}</TableCell>
+                            <TableCell>{data}</TableCell>
+                            {/* <TableCell numeric>{score.ID}</TableCell>
                             <TableCell numeric>{score.TotalTime}</TableCell>
-                            <TableCell numeric>{score.TotalScore}</TableCell>
+                            <TableCell numeric>{score.TotalScore}</TableCell> */}
                           </TableRow>
-                          {isSelected && (
+                          {/* {isSelected && (
                             <React.Fragment>
                               <ScoreMetaData
                                 classes={classes.row}
@@ -199,7 +200,7 @@ class Leaderboard extends Component {
                                 score={score.BinaryTreesScore}
                               />
                             </React.Fragment>
-                          )}
+                          )} */}
                         </React.Fragment>
                       );
                     })}
