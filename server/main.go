@@ -48,7 +48,7 @@ func main() {
 	router.HandleFunc("/results/update/{id:[0-9]+}", handlers.UpdateResult(db))
 
 	svr := &http.Server{
-		Addr:    ":443",
+		Addr:    "127.0.0.1:443",
 		Handler: router,
 	}
 
@@ -57,7 +57,7 @@ func main() {
 		keyFile  = "/home/osbadmin/cert/key.key"
 	)
 	go func() {
-		fmt.Println("Listening on https://", svr.Addr)
+		fmt.Printf("Listening on https://%v\n", svr.Addr)
 
 		if err := svr.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
