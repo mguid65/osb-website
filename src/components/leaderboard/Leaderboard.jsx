@@ -140,12 +140,12 @@ class Leaderboard extends Component {
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(score => {
-                      const isSelected = this.isSelected(score.ID);
+                      const isSelected = this.isSelected(score.name);
                       return (
-                        <React.Fragment key={score.ID}>
+                        <React.Fragment key={score.name}>
                           <TableRow
                             hover
-                            onClick={event => this.handleClick(event, score.ID)}
+                            onClick={event => this.handleClick(event, score.name)}
                             role="checkbox"
                             aria-checked={isSelected}
                             tabIndex={-1}
@@ -160,50 +160,12 @@ class Leaderboard extends Component {
                               scope="row"
                               padding="none"
                             >
-                              {score.ResultAlias}
+                              {score.name}
                             </TableCell>
-                            {score.name == 'total' && (
-                              <React.Fragment>
-                                <TableCell numeric>{}</TableCell>
-                                <TableCell numeric>{score.time}</TableCell>
-                                <TableCell numeric>{score.score}</TableCell>
-                              </React.Fragment>
-                            )}
+                            <TableCell numeric>{score.name}</TableCell>
+                            <TableCell numeric>{score.time}</TableCell>
+                            <TableCell numeric>{score.score}</TableCell>
                           </TableRow>
-                          {isSelected && (
-                            <React.Fragment>
-                              <ScoreMetaData
-                                classes={classes.row}
-                                name="N-Body"
-                                time={score.NBodyTime}
-                                score={score.NBodyScore}
-                              />
-                              <ScoreMetaData
-                                classes={classes.row}
-                                name="PI Digits"
-                                time={score.PiDigitsTime}
-                                score={score.PiDigitsScore}
-                              />
-                              <ScoreMetaData
-                                classes={classes.row}
-                                name="Mandelbrot"
-                                time={score.MandelbrotTime}
-                                score={score.MandelbrotScore}
-                              />
-                              <ScoreMetaData
-                                classes={classes.row}
-                                name="Spectral Norm"
-                                time={score.SpectralNormTime}
-                                score={score.SpectralNormScore}
-                              />
-                              <ScoreMetaData
-                                classes={classes.row}
-                                name="Binary Trees"
-                                time={score.BinaryTreesTime}
-                                score={score.BinaryTreesScore}
-                              />
-                            </React.Fragment>
-                          )}
                         </React.Fragment>
                       );
                     })}

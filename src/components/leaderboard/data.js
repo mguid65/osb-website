@@ -3,7 +3,7 @@
  * @returns {Object[]} The JSON representation of scores data.
  */
 async function getData() {
-  const res = await fetch("https://localhost:443/results");
+  const res = await fetch("https://opensystembench.com/results");
   return res.json();
 }
 
