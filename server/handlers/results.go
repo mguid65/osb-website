@@ -20,12 +20,7 @@ func ListResults(db database.ResultDatabase) http.HandlerFunc {
 			return
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		enc := json.NewEncoder(w)
-		enc.SetIndent("", "  ")
-		if err := enc.Encode(results); err != nil {
+		if err := sendJSONResponse(w, results); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	}
@@ -52,16 +47,7 @@ func ListResultsCreatedBy(db database.ResultDatabase) http.HandlerFunc {
 			return
 		}
 
-		b, err := json.Marshal(results)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		if _, err := w.Write(b); err != nil {
+		if err := sendJSONResponse(w, results); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -73,7 +59,7 @@ func GetResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
-			http.Error(w, `router: no "id" key in router`, http.StatusInternalServerError)
+			http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
 			return
 		}
 
@@ -86,21 +72,10 @@ func GetResult(db database.ResultDatabase) http.HandlerFunc {
 		result, err := db.GetResult(resultID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 
-		b, err := json.Marshal(result)
-		if err != nil {
+		if err := sendJSONResponse(w, result); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		if _, err := w.Write(b); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 	}
 }
@@ -143,7 +118,7 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("successfully submited result id", id)
+		log.Println("successfully added result id", id)
 
 		specs := &database.Specs{
 			ResultID: id,
@@ -154,7 +129,7 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("successfully submitted specs id", id)
+		log.Println("successfully added specs id", id)
 
 		w.WriteHeader(http.StatusOK)
 	}
@@ -163,9 +138,14 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 // DeleteResult deletes the result row with the matching result id.
 func DeleteResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
-			http.Error(w, `router: no "id" key in router`, http.StatusInternalServerError)
+			http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
 			return
 		}
 
@@ -179,6 +159,7 @@ func DeleteResult(db database.ResultDatabase) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
@@ -186,12 +167,19 @@ func DeleteResult(db database.ResultDatabase) http.HandlerFunc {
 // UpdateResult updates the result with the given values.
 func UpdateResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var result *database.Result
-		// TODO: make result
-		if err := db.UpdateResult(result); err != nil {
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		// TODO: get result values
+		var result database.Result
+
+		if err := db.UpdateResult(&result); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
 		w.WriteHeader(http.StatusOK)
 	}
 }
