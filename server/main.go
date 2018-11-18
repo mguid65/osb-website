@@ -7,7 +7,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/ssh/terminal"
@@ -36,15 +35,8 @@ func main() {
 	}
 	defer db.Close()
 
-	srv := &http.Server{
-		Addr:         "127.0.0.1:443",
-		Handler:      handler(db),
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	fmt.Println("Listening on https://", srv.Addr)
-	log.Fatal(srv.ListenAndServeTLS("/home/osbadmin/cert/key.pem", "/home/osbadmin/cert/key.key"))
+	fmt.Println("Listening on https://localhost:443/")
+	log.Fatal(http.ListenAndServeTLS(":443", "/home/osbadmin/cert/key.pem", "/home/osbadmin/cert/key.key", handler(db)))
 }
 
 func handler(db database.OSBDatabase) *mux.Router {
@@ -57,7 +49,7 @@ func handler(db database.OSBDatabase) *mux.Router {
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {
 	r.HandleFunc("/users", handlers.ListUsers(db)).Methods(http.MethodGet)
 	r.HandleFunc("/users/{id:[0-9]+}", handlers.GetUser(db)).Methods(http.MethodGet)
-	r.HandleFunc("/users/add", handlers.AddUser(db)).Methods(http.MethodPost) // TODO: figure out route
+	r.HandleFunc("/users/register", handlers.AddUser(db)).Methods(http.MethodPost)
 	r.HandleFunc("/users/delete/{id:[0-9]+}", handlers.DeleteUser(db)).Methods(http.MethodPost)
 	r.HandleFunc("/users/update/{id:[0-9]+}", handlers.UpdateUser(db)).Methods(http.MethodPost)
 }
