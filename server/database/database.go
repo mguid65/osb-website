@@ -270,7 +270,7 @@ func (db *mysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
 		db,
 		&listSpecsCreatedByOnce,
 		"listSpecsCreatedBy",
-		`SELECT * FROM Specs WHERE specs_id = ?`,
+		`SELECT * FROM Specs WHERE result_id = ?`,
 	)
 	if err != nil {
 		return nil, err
