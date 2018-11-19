@@ -65,7 +65,7 @@ func addResultHandlers(r *mux.Router, db database.OSBDatabase) {
 
 func addSpecsHandlers(r *mux.Router, db database.OSBDatabase) {
 	r.HandleFunc("/specs", handlers.ListSpecs(db)).Methods(http.MethodGet)
-	r.HandleFunc("/specs/result/{id:[0-9]+}", handlers.ListSpecsCreatedBy(db)).Methods(http.MethodGet)
+	r.HandleFunc("/specs/result/{id:[0-9]+}", handlers.ListSpecsWithResultID(db)).Methods(http.MethodGet)
 	r.HandleFunc("/specs/{id:[0-9]+}", handlers.GetSpecs(db)).Methods(http.MethodGet)
 	r.HandleFunc("/specs/add", handlers.AddSpecs(db)).Methods(http.MethodPost)
 	r.HandleFunc("/specs/delete/{id:[0-9]+}", handlers.DeleteSpecs(db)).Methods(http.MethodPost)

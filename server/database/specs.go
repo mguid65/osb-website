@@ -11,8 +11,8 @@ type SpecsDatabase interface {
 	// ListSpecs returns a list of all specs.
 	ListSpecs() ([]*Specs, error)
 
-	// ListSpecsCreatedBy returns a list of specs created by a user with the given id.
-	ListSpecsCreatedBy(id int64) ([]*Specs, error)
+	// ListSpecsWithResultID returns a spec related to a result.
+	ListSpecsWithResultID(id int64) ([]*Specs, error)
 
 	// GetSpecs retrieves specs by its id.
 	GetSpecs(id int64) (*Specs, error)

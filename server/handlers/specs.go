@@ -2,6 +2,10 @@ package handlers
 
 import (
 	"net/http"
+        "strconv"
+
+        "github.com/gorilla/mux"
+
 
 	"github.com/mguid65/osb-website/server/database"
 )
@@ -9,21 +13,69 @@ import (
 // ListSpecs returns a list of all specs.
 func ListSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		panic("implement me")
+		specs, err := db.ListSpecs()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := sendJSONResponse(w, specs); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
-// ListSpecsCreatedBy returns a list of specs created by a user with the given id.
-func ListSpecsCreatedBy(db database.SpecsDatabase) http.HandlerFunc {
+// ListSpecsWithResultID returns a spec related to a result.
+func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		panic("implement me")
+		idStr, ok := mux.Vars(r)["id"]
+		if !ok {
+			http.Error(w, `router: no "id" key in router`, http.StatusInternalServerError)
+			return
+		}
+
+		resultID, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		specs, err := db.GetSpecs(resultID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := sendJSONResponse(w, specs); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 }
 
 // GetSpecs retrieves specs by its id.
 func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		panic("implement me")
+                idStr, ok := mux.Vars(r)["id"]
+                if !ok {
+                        http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
+                        return
+                }
+
+                specsID, err := strconv.ParseInt(idStr, 10, 64)
+                if err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                        return
+                }
+
+                specs, err := db.GetSpecs(specsID)
+                if err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                }
+
+                if err := sendJSONResponse(w, specs); err != nil {
+                        http.Error(w, err.Error(), http.StatusInternalServerError)
+                }
 	}
 }
 

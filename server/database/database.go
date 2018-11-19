@@ -262,13 +262,13 @@ func (db *mysqlDB) ListSpecs() ([]*Specs, error) {
 	return specs, nil
 }
 
-var listSpecsCreatedByOnce sync.Once
+var listSpecsWithResultIDOnce sync.Once
 
-// ListSpecsCreatedBy returns a list of specs created by a user with the given id.
-func (db *mysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
-	listSpecsCreatedBy, err := newStmt(
+// ListSpecsWithResultID returns a list of specs created by a user with the given id.
+func (db *mysqlDB) ListSpecsWithResultID(id int64) ([]*Specs, error) {
+	listSpecsWithResultID, err := newStmt(
 		db,
-		&listSpecsCreatedByOnce,
+		&listSpecsWithResultIDOnce,
 		"listSpecsCreatedBy",
 		`SELECT * FROM Specs WHERE result_id = ?`,
 	)
@@ -279,7 +279,7 @@ func (db *mysqlDB) ListSpecsCreatedBy(id int64) ([]*Specs, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	rows, err := listSpecsCreatedBy.QueryContext(ctx, id)
+	rows, err := listSpecsWithResultID.QueryContext(ctx, id)
 	if err != nil {
 		return nil, err
 	}
