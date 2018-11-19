@@ -82,20 +82,102 @@ func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // AddSpecs saves the given specs. maybe unecessary
 func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		panic("implement me")
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		username, password, ok := r.BasicAuth()
+		if !ok {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		user, err := db.GetUserByCredentials(username, password)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		}
+
+		submission := struct {
+			Scores  database.Scores  `json:"scores"`
+			SysInfo database.SysInfo `json:"specs"`
+		}{}
+		if err := json.NewDecoder(r.Body).Decode(&submission); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		result := &database.Result{
+			UserID: user.ID,
+		}
+		id, err := db.AddResult(result)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println("successfully added result id", id)
+
+		specs := &database.Specs{
+			ResultID: id,
+			SysInfo:  submission.SysInfo,
+		}
+		_, err = db.AddSpecs(specs)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println("successfully added sys info")
+
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
 // DeleteSpecs deletes the specs with the given id. maybe unecessary
 func DeleteSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		panic("implement me")
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		idStr, ok := mux.Vars(r)["id"]
+		if !ok {
+			http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
+			return
+		}
+
+		specsID, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := db.DeleteSpecs(specsID); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
 // UpdateSpecs updates the given specs. maybe unecessary
 func UpdateSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		panic("implement me")
+		if r.Method != http.MethodPost {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
+		// TODO: get specs values
+		var specs database.Specs
+
+		if err := db.UpdateSpecs(&specs); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
 	}
 }
