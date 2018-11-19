@@ -3,9 +3,9 @@ package handlers
 import (
 	"net/http"
         "strconv"
-
+//	"log"
+//	"encoding/json"
         "github.com/gorilla/mux"
-
 
 	"github.com/mguid65/osb-website/server/database"
 )
@@ -79,57 +79,9 @@ func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	}
 }
 
-// AddSpecs saves the given specs. maybe unecessary
+// AddSpecs saves the given specs. maybe unecessary why does this add a whole entry
 func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		username, password, ok := r.BasicAuth()
-		if !ok {
-			w.WriteHeader(http.StatusForbidden)
-			return
-		}
-
-		user, err := db.GetUserByCredentials(username, password)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		}
-
-		submission := struct {
-			Scores  database.Scores  `json:"scores"`
-			SysInfo database.SysInfo `json:"specs"`
-		}{}
-		if err := json.NewDecoder(r.Body).Decode(&submission); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		result := &database.Result{
-			UserID: user.ID,
-		}
-		id, err := db.AddResult(result)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		log.Println("successfully added result id", id)
-
-		specs := &database.Specs{
-			ResultID: id,
-			SysInfo:  submission.SysInfo,
-		}
-		_, err = db.AddSpecs(specs)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		log.Println("successfully added sys info")
-
-		w.WriteHeader(http.StatusOK)
 	}
 }
 
