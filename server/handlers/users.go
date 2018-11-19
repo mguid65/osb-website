@@ -18,8 +18,6 @@ import (
 // ListUsers returns a list of all users.
 func ListUsers(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -40,8 +38,6 @@ func ListUsers(db database.UserDatabase) http.HandlerFunc {
 // GetUser retrieves a user by its id.
 func GetUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -74,8 +70,6 @@ func GetUser(db database.UserDatabase) http.HandlerFunc {
 // AddUser saves a given user.
 func AddUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -118,8 +112,6 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 // DeleteUser deletes a user with the given id.
 func DeleteUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -149,8 +141,6 @@ func DeleteUser(db database.UserDatabase) http.HandlerFunc {
 // UpdateUser updates a given user.
 func UpdateUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return

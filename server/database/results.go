@@ -59,18 +59,18 @@ func (s *Scores) Scan(value interface{}) error {
 // scanResult returns a result from a database row.
 func scanResult(s rowScanner) (*Result, error) {
 	var (
-		id      int64
-		userID  int64
-		results string
+		id     int64
+		userID int64
+		scores string
 	)
-	if err := s.Scan(&id, &userID, &results); err != nil {
+	if err := s.Scan(&id, &userID, &scores); err != nil {
 		return nil, err
 	}
 	result := &Result{
 		ID:     id,
 		UserID: userID,
 	}
-	err := json.NewDecoder(strings.NewReader(results)).Decode(&result.Scores)
+	err := json.NewDecoder(strings.NewReader(scores)).Decode(&result.Scores)
 	if err != nil {
 		return nil, err
 	}

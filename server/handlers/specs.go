@@ -14,8 +14,6 @@ import (
 // ListSpecs returns a list of all specs.
 func ListSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -36,8 +34,6 @@ func ListSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // ListSpecsWithResultID returns a spec related to a result.
 func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -70,8 +66,6 @@ func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 // GetSpecs retrieves specs by its id.
 func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodGet {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -104,8 +98,6 @@ func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // AddSpecs saves the given specs.
 func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -145,8 +137,6 @@ func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // DeleteSpecs deletes the specs with the given id.
 func DeleteSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -176,8 +166,6 @@ func DeleteSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // UpdateSpecs updates the given specs.
 func UpdateSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer r.Body.Close()
-
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
