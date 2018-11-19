@@ -270,7 +270,7 @@ func (db *mysqlDB) ListSpecsWithResultID(id int64) ([]*Specs, error) {
 	listSpecsWithResultID, err := newStmt(
 		db,
 		&listSpecsWithResultIDOnce,
-		"listSpecsCreatedBy",
+		"listSpecsWithResultID",
 		`SELECT * FROM Specs WHERE result_id = ?`,
 	)
 	if err != nil {

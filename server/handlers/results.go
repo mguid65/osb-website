@@ -49,7 +49,6 @@ func ListResultsCreatedBy(db database.ResultDatabase) http.HandlerFunc {
 
 		if err := sendJSONResponse(w, results); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 	}
 }
@@ -83,11 +82,6 @@ func GetResult(db database.ResultDatabase) http.HandlerFunc {
 // AddResult inserts a new result row.
 func AddResult(db database.OSBDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
 		username, password, ok := r.BasicAuth()
 		if !ok {
 			w.WriteHeader(http.StatusForbidden)
@@ -138,11 +132,6 @@ func AddResult(db database.OSBDatabase) http.HandlerFunc {
 // DeleteResult deletes the result row with the matching result id.
 func DeleteResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
 			http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
@@ -167,11 +156,6 @@ func DeleteResult(db database.ResultDatabase) http.HandlerFunc {
 // UpdateResult updates the result with the given values.
 func UpdateResult(db database.ResultDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
 		// TODO: get result values
 		var result database.Result
 

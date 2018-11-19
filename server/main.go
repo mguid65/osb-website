@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
 	"golang.org/x/crypto/ssh/terminal"
 
 	"github.com/mguid65/osb-website/server/database"
@@ -35,39 +34,13 @@ func main() {
 	}
 	defer db.Close()
 
+	var (
+		addr     = ":443"
+		certFile = "/home/osbadmin/cert/key.pem"
+		keyFile  = "/home/osbadmin/cert/key.key"
+		handler  = handlers.Handler(db)
+	)
+
 	fmt.Println("Listening on https://localhost:443/")
-	log.Fatal(http.ListenAndServeTLS(":443", "/home/osbadmin/cert/key.pem", "/home/osbadmin/cert/key.key", handler(db)))
-}
-
-func handler(db database.OSBDatabase) *mux.Router {
-	r := mux.NewRouter()
-	addUserHandlers(r, db)
-	addResultHandlers(r, db)
-	addSpecsHandlers(r, db)
-	return r
-}
-func addUserHandlers(r *mux.Router, db database.OSBDatabase) {
-	r.HandleFunc("/users", handlers.ListUsers(db)).Methods(http.MethodGet)
-	r.HandleFunc("/users/{id:[0-9]+}", handlers.GetUser(db)).Methods(http.MethodGet)
-	r.HandleFunc("/users/register", handlers.AddUser(db)).Methods(http.MethodPost)
-	r.HandleFunc("/users/delete/{id:[0-9]+}", handlers.DeleteUser(db)).Methods(http.MethodPost)
-	r.HandleFunc("/users/update/{id:[0-9]+}", handlers.UpdateUser(db)).Methods(http.MethodPost)
-}
-
-func addResultHandlers(r *mux.Router, db database.OSBDatabase) {
-	r.HandleFunc("/results", handlers.ListResults(db)).Methods(http.MethodGet)
-	r.HandleFunc("/results/user/{id:[0-9]+}", handlers.ListResultsCreatedBy(db)).Methods(http.MethodGet)
-	r.HandleFunc("/results/{id:[0-9]+}", handlers.GetResult(db)).Methods(http.MethodGet)
-	r.HandleFunc("/results/submit", handlers.AddResult(db)).Methods(http.MethodPost)
-	r.HandleFunc("/results/delete/{id:[0-9]+}", handlers.DeleteResult(db)).Methods(http.MethodPost)
-	r.HandleFunc("/results/update/{id:[0-9]+}", handlers.UpdateResult(db)).Methods(http.MethodPost)
-}
-
-func addSpecsHandlers(r *mux.Router, db database.OSBDatabase) {
-	r.HandleFunc("/specs", handlers.ListSpecs(db)).Methods(http.MethodGet)
-	r.HandleFunc("/specs/result/{id:[0-9]+}", handlers.ListSpecsWithResultID(db)).Methods(http.MethodGet)
-	r.HandleFunc("/specs/{id:[0-9]+}", handlers.GetSpecs(db)).Methods(http.MethodGet)
-	r.HandleFunc("/specs/add", handlers.AddSpecs(db)).Methods(http.MethodPost)
-	r.HandleFunc("/specs/delete/{id:[0-9]+}", handlers.DeleteSpecs(db)).Methods(http.MethodPost)
-	r.HandleFunc("/specs/update/{id:[0-9]+}", handlers.UpdateSpecs(db)).Methods(http.MethodPost)
+	log.Fatal(http.ListenAndServeTLS(addr, certFile, keyFile, handler))
 }
