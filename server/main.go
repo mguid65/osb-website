@@ -41,11 +41,17 @@ func main() {
 
 func handler(db database.OSBDatabase) *mux.Router {
 	r := mux.NewRouter()
+	addRootHandler(r)
 	addUserHandlers(r, db)
 	addResultHandlers(r, db)
 	addSpecsHandlers(r, db)
 	return r
 }
+
+func addRootHandler(r *mux.Router) {
+	r.Handle("/", http.FileServer(http.Dir("./build")))
+}
+
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {
 	r.HandleFunc("/users", handlers.ListUsers(db)).Methods(http.MethodGet)
 	r.HandleFunc("/users/{id:[0-9]+}", handlers.GetUser(db)).Methods(http.MethodGet)
@@ -67,7 +73,7 @@ func addSpecsHandlers(r *mux.Router, db database.OSBDatabase) {
 	r.HandleFunc("/specs", handlers.ListSpecs(db)).Methods(http.MethodGet)
 	r.HandleFunc("/specs/result/{id:[0-9]+}", handlers.ListSpecsWithResultID(db)).Methods(http.MethodGet)
 	r.HandleFunc("/specs/{id:[0-9]+}", handlers.GetSpecs(db)).Methods(http.MethodGet)
-	r.HandleFunc("/specs/add", handlers.AddSpecs(db)).Methods(http.MethodPost)
+	r.HandleFunc("/specs/add/result/{id:[0-9]+}", handlers.AddSpecs(db)).Methods(http.MethodPost)
 	r.HandleFunc("/specs/delete/{id:[0-9]+}", handlers.DeleteSpecs(db)).Methods(http.MethodPost)
 	r.HandleFunc("/specs/update/{id:[0-9]+}", handlers.UpdateSpecs(db)).Methods(http.MethodPost)
 }

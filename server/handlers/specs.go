@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
-        "strconv"
+	"strconv"
 
-        "github.com/gorilla/mux"
-
+	"github.com/gorilla/mux"
 
 	"github.com/mguid65/osb-website/server/database"
 )
@@ -13,6 +14,13 @@ import (
 // ListSpecs returns a list of all specs.
 func ListSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		specs, err := db.ListSpecs()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -28,6 +36,13 @@ func ListSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // ListSpecsWithResultID returns a spec related to a result.
 func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
 			http.Error(w, `router: no "id" key in router`, http.StatusInternalServerError)
@@ -40,7 +55,7 @@ func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 			return
 		}
 
-		specs, err := db.GetSpecs(resultID)
+		specs, err := db.ListSpecsWithResultID(resultID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -48,7 +63,6 @@ func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 
 		if err := sendJSONResponse(w, specs); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 	}
 }
@@ -56,78 +70,73 @@ func ListSpecsWithResultID(db database.SpecsDatabase) http.HandlerFunc {
 // GetSpecs retrieves specs by its id.
 func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-                idStr, ok := mux.Vars(r)["id"]
-                if !ok {
-                        http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
-                        return
-                }
+		defer r.Body.Close()
 
-                specsID, err := strconv.ParseInt(idStr, 10, 64)
-                if err != nil {
-                        http.Error(w, err.Error(), http.StatusInternalServerError)
-                        return
-                }
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
 
-                specs, err := db.GetSpecs(specsID)
-                if err != nil {
-                        http.Error(w, err.Error(), http.StatusInternalServerError)
-                }
+		idStr, ok := mux.Vars(r)["id"]
+		if !ok {
+			http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
+			return
+		}
 
-                if err := sendJSONResponse(w, specs); err != nil {
-                        http.Error(w, err.Error(), http.StatusInternalServerError)
-                }
+		specsID, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		specs, err := db.GetSpecs(specsID)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := sendJSONResponse(w, specs); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 
 // AddSpecs saves the given specs.
 func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
-		username, password, ok := r.BasicAuth()
+		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
-			w.WriteHeader(http.StatusForbidden)
+			http.Error(w, `router: no "id" key`, http.StatusInternalServerError)
 			return
 		}
 
-		user, err := db.GetUserByCredentials(username, password)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		}
-
-		submission := struct {
-			Scores  database.Scores  `json:"scores"`
-			SysInfo database.SysInfo `json:"specs"`
-		}{}
-		if err := json.NewDecoder(r.Body).Decode(&submission); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		result := &database.Result{
-			UserID: user.ID,
-		}
-		id, err := db.AddResult(result)
+		resultID, err := strconv.ParseInt(idStr, 10, 64)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("successfully added result id", id)
 
-		specs := &database.Specs{
-			ResultID: id,
-			SysInfo:  submission.SysInfo,
+		specs := database.Specs{
+			ResultID: resultID,
 		}
-		_, err = db.AddSpecs(specs)
+		if err := json.NewDecoder(r.Body).Decode(&specs); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		id, err := db.AddSpecs(&specs)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("successfully added sys info")
+		log.Println("successfully inserted specs id", id)
 
 		w.WriteHeader(http.StatusOK)
 	}
@@ -136,6 +145,8 @@ func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // DeleteSpecs deletes the specs with the given id.
 func DeleteSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -165,6 +176,8 @@ func DeleteSpecs(db database.SpecsDatabase) http.HandlerFunc {
 // UpdateSpecs updates the given specs.
 func UpdateSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return

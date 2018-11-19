@@ -1,9 +1,14 @@
 package handlers
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -13,6 +18,13 @@ import (
 // ListUsers returns a list of all users.
 func ListUsers(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		users, err := db.ListUsers()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -21,7 +33,6 @@ func ListUsers(db database.UserDatabase) http.HandlerFunc {
 
 		if err := sendJSONResponse(w, users); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 	}
 }
@@ -29,9 +40,17 @@ func ListUsers(db database.UserDatabase) http.HandlerFunc {
 // GetUser retrieves a user by its id.
 func GetUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
+		if r.Method != http.MethodGet {
+			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+
 		idStr, ok := mux.Vars(r)["id"]
 		if !ok {
 			http.Error(w, `route: no key "id"`, http.StatusInternalServerError)
+			return
 		}
 
 		id, err := strconv.ParseInt(idStr, 10, 64)
@@ -55,20 +74,42 @@ func GetUser(db database.UserDatabase) http.HandlerFunc {
 // AddUser saves a given user.
 func AddUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
-		// TODO: get user values and hash password
+		if err := r.ParseForm(); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		var user database.User
+		for k, v := range r.Form {
+			fmt.Println(k, v)
+			switch k {
+			case "email":
+				user.Email = v[0]
+			case "username":
+				user.Name = v[0]
+			case "password":
+				hash := sha256.New()
+				if _, err := io.Copy(hash, strings.NewReader(v[0])); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				user.Password = hex.EncodeToString(hash.Sum(nil))
+			}
+		}
 
 		id, err := db.AddUser(&user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("successfully added result id", id)
+		log.Println("successfully added user id", id)
 
 		w.WriteHeader(http.StatusOK)
 	}
@@ -77,6 +118,8 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 // DeleteUser deletes a user with the given id.
 func DeleteUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
@@ -106,12 +149,14 @@ func DeleteUser(db database.UserDatabase) http.HandlerFunc {
 // UpdateUser updates a given user.
 func UpdateUser(db database.UserDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
 
-		// TODO: get result values
+		// TODO: get user values
 		var user database.User
 
 		if err := db.UpdateUser(&user); err != nil {
