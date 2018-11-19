@@ -58,7 +58,7 @@ class Leaderboard extends Component {
     page: 0,
     rowsPerPage: 5
   };
-
+  
   componentDidMount = async () => {
     const data = await getData();
     await sleep(1000);
@@ -112,12 +112,13 @@ class Leaderboard extends Component {
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
-  render() {
+  render() { 
+
     const { classes } = this.props;
     const { data, order, orderBy, rowsPerPage, page, loading } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-
+    console.log(data)
     return (
       <Paper className={classes.root}>
         <LeaderboardToolbar onRefresh={this.handleRefresh} />
@@ -139,13 +140,13 @@ class Leaderboard extends Component {
                 <React.Fragment>
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map(score => {
-                      const isSelected = this.isSelected(score.name);
+                    .map(data => {
+                      const isSelected = this.isSelected(data.scores[5].name);
                       return (
-                        <React.Fragment key={score.name}>
+                        <React.Fragment key={data.scores[5].name}>
                           <TableRow
                             hover
-                            onClick={event => this.handleClick(event, score.name)}
+                            onClick={event => this.handleClick(event, data.scores[5].name)}
                             role="checkbox"
                             aria-checked={isSelected}
                             tabIndex={-1}
@@ -160,11 +161,11 @@ class Leaderboard extends Component {
                               scope="row"
                               padding="none"
                             >
-                              {score.name}
+                              {data.scores[5].name}
                             </TableCell>
-                            <TableCell numeric>{score.name}</TableCell>
-                            <TableCell numeric>{score.time}</TableCell>
-                            <TableCell numeric>{score.score}</TableCell>
+                            <TableCell numeric>{data.scores[5].name}</TableCell>
+                            <TableCell numeric>{data.scores[5].time}</TableCell>
+                            <TableCell numeric>{data.scores[5].score}</TableCell>
                           </TableRow>
                         </React.Fragment>
                       );

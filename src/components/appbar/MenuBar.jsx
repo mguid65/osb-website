@@ -33,7 +33,7 @@ const MenuBar = props => {
           noWrap
           className={classes.title}
         >
-          Open System Bench
+          OpenSystemBench
         </Typography>
         <IconButton color="inherit">
           <Badge badgeContent={4} color="secondary">

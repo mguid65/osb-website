@@ -79,21 +79,21 @@ func GetSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	}
 }
 
-// AddSpecs saves the given specs.
+// AddSpecs saves the given specs. maybe unecessary
 func AddSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		panic("implement me")
 	}
 }
 
-// DeleteSpecs deletes the specs with the given id.
+// DeleteSpecs deletes the specs with the given id. maybe unecessary
 func DeleteSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		panic("implement me")
 	}
 }
 
-// UpdateSpecs updates the given specs.
+// UpdateSpecs updates the given specs. maybe unecessary
 func UpdateSpecs(db database.SpecsDatabase) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		panic("implement me")

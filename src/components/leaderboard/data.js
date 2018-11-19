@@ -7,6 +7,11 @@ async function getData() {
   return res.json();
 }
 
+async function getUserName(userID) {
+  const res = await fetch("https://opensystembench.com/users/" + userID);
+  return res.json().username;
+}
+
 /**
  * Compares two elements in descending order.
  * @param {*} a An element.
@@ -57,4 +62,5 @@ function sleep(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-export { sleep, getData, desc, stableSort, getSorting };
+export { sleep, getData, getUserName, desc, stableSort, getSorting };
+
