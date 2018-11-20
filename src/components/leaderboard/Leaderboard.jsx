@@ -15,7 +15,7 @@ import { ExpandLess, ExpandMore } from "@material-ui/icons";
 import LeaderboardHeader from "./LeaderboardHeader";
 import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
-import { sleep, getData, stableSort, getSorting } from "./data";
+import { sleep, getData, getUserNames, stableSort, getSorting } from "./data";
 
 const ScoreMetaData = ({ classes, name, time, score }) => {
   return (
@@ -54,6 +54,7 @@ class Leaderboard extends Component {
     orderBy: "TotalScore",
     selected: [],
     data: [],
+    user: [],
     loading: true,
     page: 0,
     rowsPerPage: 5
@@ -62,7 +63,11 @@ class Leaderboard extends Component {
   componentDidMount = async () => {
     const data = await getData();
     await sleep(1000);
-    this.setState({ data, loading: false });
+    this.setState({ data});
+
+    const user = await getUserNames();
+    await sleep(1000);
+    this.setState({ user, loading: false });
   };
 
   handleRequestSort = (event, property) => {
@@ -106,7 +111,10 @@ class Leaderboard extends Component {
   handleRefresh = () => {
     this.setState({ loading: true });
     sleep(1000).then(() =>
-      getData().then(scores => this.setState({ data: scores, loading: false }))
+      getData().then(scores => this.setState({ data: scores }))
+    );
+    sleep(1000).then(() =>
+      getUserNames().then(users => this.setState({ user: users, loading: false }))
     );
   };
 
@@ -115,10 +123,10 @@ class Leaderboard extends Component {
   render() { 
 
     const { classes } = this.props;
-    const { data, order, orderBy, rowsPerPage, page, loading } = this.state;
+    const { data, user, order, orderBy, rowsPerPage, page, loading } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-    console.log(data)
+    console.log(user);
     return (
       <Paper className={classes.root}>
         <LeaderboardToolbar onRefresh={this.handleRefresh} />
@@ -141,12 +149,15 @@ class Leaderboard extends Component {
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(data => {
-                      const isSelected = this.isSelected(data.scores[5].name);
+                      const isSelected = this.isSelected(user.find(function(e) {
+				return e.ID == data.UserID }).Name);
                       return (
-                        <React.Fragment key={data.scores[5].name}>
+                        <React.Fragment key={user.find(function(e) {
+                                return e.ID == data.UserID }).Name}>
                           <TableRow
                             hover
-                            onClick={event => this.handleClick(event, data.scores[5].name)}
+                            onClick={event => this.handleClick(event, user.find(function(e) {
+                                return e.ID == data.UserID }).Name)}
                             role="checkbox"
                             aria-checked={isSelected}
                             tabIndex={-1}
@@ -161,9 +172,11 @@ class Leaderboard extends Component {
                               scope="row"
                               padding="none"
                             >
-                              {data.scores[5].name}
+                              {user.find(function(e) {
+                                return e.ID == data.UserID }).Name}
                             </TableCell>
-                            <TableCell numeric>{data.scores[5].name}</TableCell>
+                            <TableCell numeric>{user.find(function(e) {
+                                return e.ID == data.UserID }).Name}</TableCell>
                             <TableCell numeric>{data.scores[5].time}</TableCell>
                             <TableCell numeric>{data.scores[5].score}</TableCell>
                           </TableRow>

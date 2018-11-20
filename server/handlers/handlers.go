@@ -12,15 +12,31 @@ import (
 // Handler returns the OSB website route handler.
 func Handler(db database.OSBDatabase) *mux.Router {
 	r := mux.NewRouter()
+	api := r.PathPrefix("/api/").Subrouter()
 	addRootHandler(r)
-	addUserHandlers(r, db)
-	addResultHandlers(r, db)
-	addSpecsHandlers(r, db)
+	addUserHandlers(api, db)
+	addResultHandlers(api, db)
+	addSpecsHandlers(api, db)
 	return r
 }
 
 func addRootHandler(r *mux.Router) {
-	r.Handle("/", http.FileServer(http.Dir("./build")))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./build/static/"))))
+	r.PathPrefix("/service-worker.js").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+                http.ServeFile(w, r, "./build/service-worker.js")
+        })
+        r.PathPrefix("/manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+                http.ServeFile(w, r, "./build/manifest.json")
+        })
+        r.PathPrefix("/favicon.ico").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+                http.ServeFile(w, r, "./build/favicon.ico")
+        })
+        r.PathPrefix("/asset-manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+                http.ServeFile(w, r, "./build/asset-manifest.json")
+        })
+	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/index.html")
+	})
 }
 
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {

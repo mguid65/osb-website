@@ -3,13 +3,13 @@
  * @returns {Object[]} The JSON representation of scores data.
  */
 async function getData() {
-  const res = await fetch("https://opensystembench.com/results");
+  const res = await fetch("https://opensystembench.com/api/results");
   return res.json();
 }
 
-async function getUserName(userID) {
-  const res = await fetch("https://opensystembench.com/users/" + userID);
-  return res.json().username;
+async function getUserNames() {
+  const res = await fetch("https://opensystembench.com/api/users");
+  return res.json();
 }
 
 /**
@@ -62,5 +62,5 @@ function sleep(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 
-export { sleep, getData, getUserName, desc, stableSort, getSorting };
+export { sleep, getData, getUserNames, desc, stableSort, getSorting };
 
