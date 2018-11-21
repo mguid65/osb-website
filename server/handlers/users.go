@@ -101,7 +101,6 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 		}
 		fmt.Fprintf(w, "successfully added user %s\n", user.Name)
 
-		w.WriteHeader(http.StatusOK)
 		http.Redirect(w, r, "/", http.StatusOK)
 	}
 }
