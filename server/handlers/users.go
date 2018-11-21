@@ -1,9 +1,13 @@
 package handlers
 
 import (
+        "crypto/sha512"
+	"encoding/hex"
 	"fmt"
 	"net/http"
 	"strconv"
+	"io"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/mguid65/osb-website/server/database"
@@ -83,15 +87,12 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 			case "username":
 				user.Name = v[0]
 			case "password":
-				user.Password = v[0]
-				//sha_512 := sha512.New()
-				//if _, err := io.Copy(hash, strings.NewReader(v[0])); err != nil {
-				//	http.Error(w, err.Error(), http.StatusInternalServerError)
-				//	return
-				//}
-				//sha_512.Write([]byte(v[0]))
-				//user.Password = hex.EncodeToString(sha_512.Sum(nil))
-				//fmt.Println(user.Password)
+				hash := sha512.New()
+				if _, err := io.Copy(hash, strings.NewReader(v[0])); err != nil {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				user.Password = hex.EncodeToString(hash.Sum(nil))
 			}
 		}
 
@@ -99,9 +100,16 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		fmt.Fprintf(w, "successfully added user %s\n", user.Name)
 
-		http.Redirect(w, r, "/", http.StatusOK)
+		fmt.Fprintf(w, "<!DOCTYPE html><html><head>" +
+			       "<script>setTimeout(\"location.href='https://opensystembench.com';\", 2500);" +
+			       "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,500\">" +
+                               "</script>" +
+			       "</head>" +
+			       "<body class=\"mdc-typography\">" +
+			       "Successfully Added User %s <br><br><a href='https://opensystembench.com'>" +
+			       "Please click here if you are not automatically redirected" +
+			       "</a></body></html>", user.Name)
 	}
 }
 
