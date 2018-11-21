@@ -1,13 +1,14 @@
 package database
 
 import (
-	"encoding/hex"
 	"context"
+	"crypto/sha512"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"sync"
 	"time"
-	"crypto/sha512"
+
 	"github.com/go-sql-driver/mysql"
 )
 
@@ -463,10 +464,10 @@ func (db *mysqlDB) GetUserByCredentials(username, password string) (*User, error
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-        sha_512 := sha512.New()
-        sha_512.Write([]byte(password))
+	hash := sha512.New()
+	hash.Write([]byte(password))
 
-	user, err := scanUser(getUserByCredentials.QueryRowContext(ctx, username, hex.EncodeToString(sha_512.Sum(nil))))
+	user, err := scanUser(getUserByCredentials.QueryRowContext(ctx, username, hex.EncodeToString(hash.Sum(nil))))
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not read row: %v", err)
 	}
@@ -484,16 +485,16 @@ func (db *mysqlDB) AddUser(user *User) (int64, error) {
 		`INSERT INTO Users(username, email, passwd) VALUES(?, ?, ?)`,
 	)
 	if err != nil {
-	return 0, err
+		return 0, err
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	sha_512 := sha512.New()
-	sha_512.Write([]byte(user.Password))
+	hash := sha512.New()
+	hash.Write([]byte(user.Password))
 
-	r, err := addUser.ExecContext(ctx, user.Name, user.Email, hex.EncodeToString(sha_512.Sum(nil)))
+	r, err := addUser.ExecContext(ctx, user.Name, user.Email, hex.EncodeToString(hash.Sum(nil)))
 	if err != nil {
 		return 0, fmt.Errorf("mysql: add user: %v", err)
 	}

@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -98,14 +97,14 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 			}
 		}
 
-		id, err := db.AddUser(&user)
-		if err != nil {
+		if _, err := db.AddUser(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("successfully added user id", id)
+		fmt.Fprintf(w, "successfully added user %s\n", user.Name)
 
 		w.WriteHeader(http.StatusOK)
+		http.Redirect(w, r, "/", http.StatusOK)
 	}
 }
 

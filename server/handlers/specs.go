@@ -4,11 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-        "strconv"
-//	"log"
-//	"encoding/json"
+	"strconv"
 
 	"github.com/gorilla/mux"
+
 	"github.com/mguid65/osb-website/server/database"
 )
 
