@@ -1,17 +1,11 @@
 package handlers
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gorilla/mux"
-
 	"github.com/mguid65/osb-website/server/database"
 )
 
@@ -82,19 +76,22 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 
 		var user database.User
 		for k, v := range r.Form {
-			fmt.Println(k, v)
+			//fmt.Println(k, v)
 			switch k {
 			case "email":
 				user.Email = v[0]
 			case "username":
 				user.Name = v[0]
 			case "password":
-				hash := sha256.New()
-				if _, err := io.Copy(hash, strings.NewReader(v[0])); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				user.Password = hex.EncodeToString(hash.Sum(nil))
+				user.Password = v[0]
+				//sha_512 := sha512.New()
+				//if _, err := io.Copy(hash, strings.NewReader(v[0])); err != nil {
+				//	http.Error(w, err.Error(), http.StatusInternalServerError)
+				//	return
+				//}
+				//sha_512.Write([]byte(v[0]))
+				//user.Password = hex.EncodeToString(sha_512.Sum(nil))
+				//fmt.Println(user.Password)
 			}
 		}
 

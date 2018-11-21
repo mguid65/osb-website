@@ -32,42 +32,57 @@ const styles = theme => ({
 });
 
 class Register extends Component {
-  constructor() {
-    super();
-    this.handleSubmit = this.handleSubmit.bind(this);
-  }
-  handleSubmit(event){
-    event.preventDefault();
-    const data = new FormData(event.target);
-    fetch('https://opensystembench.com/api/users/register', {
-      method: 'POST',
-      body: data,
-    });
-  }
+  state = {
+    showPassword: false,
+  };
+
+  handleClickShowPassword = () => {
+    this.setState(state => ({ showPassword: !state.showPassword }));
+  };
 
   render() {
     const { classes } = this.props;
 
     return (
       <Paper className={ classes.root }>
-      <form className={ classes.container } onSubmit={this.handleSubmit}>
+      <form className={ classes.container } action="/api/users/register" method="post">
         <TextField
+	  name="email"
 	  id="filled-email-input"
+	  type="email"
+	  variant="filled"
 	  label="Email"
 	  className={ classes.textField }
           margin="normal"
         />
         <TextField
+	  name="username"
           id="filled-name"
+	  variant="filled"
           label="Username"
           className={ classes.textField }
           margin="normal"
         />
         <TextField
-          id="filled-password-input"
+	  name="password"
+          id="filled-adornment-password"
+	  type={this.state.showPassword ? 'text' : 'password'}
+	  variant="filled"
           className= { classes.textField }
 	  margin="normal"
           label="Password"
+	  InputProps={{
+            endAdornment: (
+              <InputAdornment variant="filled" position="end">
+                <IconButton
+                  aria-label="Toggle password visibility"
+                  onClick={this.handleClickShowPassword}
+                >
+                  {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <Button size="small" type="submit" className={classes.margin}>Register</Button>
       </form>
