@@ -51,7 +51,7 @@ const leaderboardStyles = theme => ({
 class Leaderboard extends Component {
   state = {
     order: "desc",
-    orderBy: "TotalScore",
+    orderBy: "score",
     selected: [],
     data: [],
     user: [],
@@ -148,7 +148,7 @@ class Leaderboard extends Component {
                 <React.Fragment>
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map(data => {
+                    .map((data, index) => {
                       const isSelected = this.isSelected(user.find(function(e) {
 				return e.ID == data.UserID }).Name);
                       return (
@@ -175,8 +175,7 @@ class Leaderboard extends Component {
                               {user.find(function(e) {
                                 return e.ID == data.UserID }).Name}
                             </TableCell>
-                            <TableCell numeric>{user.find(function(e) {
-                                return e.ID == data.UserID }).Name}</TableCell>
+                            <TableCell numeric>{(index + (page * rowsPerPage)) + 1}</TableCell>
                             <TableCell numeric>{data.scores[5].time}</TableCell>
                             <TableCell numeric>{data.scores[5].score}</TableCell>
                           </TableRow>

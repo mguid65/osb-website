@@ -20,8 +20,8 @@ async function getUserNames() {
  * @returns {number}
  */
 function desc(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) return -1;
-  if (b[orderBy] > a[orderBy]) return 1;
+  if (b.scores[5][orderBy] < a.scores[5][orderBy]) return -1;
+  if (b.scores[5][orderBy] > a.scores[5][orderBy]) return 1;
   return 0;
 }
 

@@ -3,10 +3,10 @@ package database
 // UserDatabase provides thread-safe access to a database of users.
 type UserDatabase interface {
 	// ListUsers returns a list of all users.
-	ListUsers() ([]*User, error)
+	ListUsers() ([]*UserExternal, error)
 
 	// GetUser retrieves a user by its id.
-	GetUser(id int64) (*User, error)
+	GetUser(id int64) (*UserExternal, error)
 
 	// GetUserByCredentials returns a user with the matching username and password.
 	GetUserByCredentials(user, pass string) (*User, error)
@@ -29,7 +29,28 @@ type User struct {
 	Password string // user's hashed password
 }
 
+// UserExternal represents a public view of a user in system
+type UserExternal struct {
+        ID       int64  // user's ID
+        Name     string // user's username
+}
+
 // scanUser returns a user from a database row.
+func scanUserExternal(s rowScanner) (*UserExternal, error) {
+        var (
+                id       int64
+                name     string
+        )
+        if err := s.Scan(&id, &name); err != nil {
+                return nil, err
+        }
+        userExt := &UserExternal{
+                ID:       id,
+                Name:     name,
+        }
+        return userExt, nil
+}
+
 func scanUser(s rowScanner) (*User, error) {
 	var (
 		id       int64

@@ -10,6 +10,7 @@ import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import { mainListItems, secondaryListItems } from "./listItems";
 import Leaderboard from "../leaderboard/Leaderboard";
+import Register from "../registration/Register";
 import MenuBar from "./MenuBar";
 
 const drawerWidth = 240;
@@ -90,7 +91,7 @@ const styles = theme => ({
 
 class Dashboard extends Component {
   state = {
-    open: true
+    open: false
   };
 
   handleDrawerOpen = () => {
@@ -136,7 +137,8 @@ class Dashboard extends Component {
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
             <div className={classes.tableContainer}>
-              <Leaderboard />
+	      <Register />
+	      <Leaderboard />
             </div>
           </main>
         </div>

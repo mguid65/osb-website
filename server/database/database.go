@@ -391,12 +391,12 @@ func (db *mysqlDB) UpdateSpecs(specs *Specs) error {
 var listUsersOnce sync.Once
 
 // ListUsers returns a list of all users.
-func (db *mysqlDB) ListUsers() ([]*User, error) {
+func (db *mysqlDB) ListUsers() ([]*UserExternal, error) {
 	listUsers, err := newStmt(
 		db,
 		&listUsersOnce,
 		"listUsers",
-		`SELECT * FROM Users`,
+		`SELECT user_id, username FROM Users`,
 	)
 	if err != nil {
 		return nil, err
@@ -411,26 +411,26 @@ func (db *mysqlDB) ListUsers() ([]*User, error) {
 	}
 	defer rows.Close()
 
-	var users []*User
+	var usersExt []*UserExternal
 	for rows.Next() {
-		user, err := scanUser(rows)
+		userExt, err := scanUserExternal(rows)
 		if err != nil {
 			return nil, fmt.Errorf("mysql: could not read row: %v", err)
 		}
-		users = append(users, user)
+		usersExt = append(usersExt, userExt)
 	}
-	return users, nil
+	return usersExt, nil
 }
 
 var getUserOnce sync.Once
 
 // GetUser retrieves a user by its id.
-func (db *mysqlDB) GetUser(id int64) (*User, error) {
-	getUser, err := newStmt(
+func (db *mysqlDB) GetUser(id int64) (*UserExternal, error) {
+	getUserExt, err := newStmt(
 		db,
 		&getUserOnce,
 		"getUser",
-		`SELECT * from Users WHERE user_id = ?`,
+		`SELECT user_id, username from Users WHERE user_id = ?`,
 	)
 	if err != nil {
 		return nil, err
@@ -439,11 +439,11 @@ func (db *mysqlDB) GetUser(id int64) (*User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	user, err := scanUser(getUser.QueryRowContext(ctx, id))
+	userExt, err := scanUserExternal(getUserExt.QueryRowContext(ctx, id))
 	if err != nil {
 		return nil, fmt.Errorf("mysql: could not read row: %v", err)
 	}
-	return user, nil
+	return userExt, nil
 }
 
 var getUserByCredentialsOnce sync.Once

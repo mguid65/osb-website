@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Badge from "@material-ui/core/Badge";
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/Notifications";
+import PersonAdd from "@material-ui/icons/PersonAdd";
 
 const MenuBar = props => {
   const { classes, state, onClick } = props;

@@ -9,6 +9,7 @@ import PeopleIcon from "@material-ui/icons/People";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import SvgIcon from "@material-ui/core/SvgIcon";
+import PersonAdd from "@material-ui/icons/PersonAdd";
 
 export const mainListItems = (
   <React.Fragment>
@@ -23,6 +24,14 @@ export const mainListItems = (
         <DownloadIcon />
       </ListItemIcon>
       <ListItemText primary="Download" />
+    </ListItem>
+    <ListItem button>
+      <ListItemIcon>
+        <a href="https://opensystembench.com/register.html"
+         style={{ testDecoration: "none" }}
+	><PersonAdd /></a>
+      </ListItemIcon>
+      <ListItemText primary="Register" />
     </ListItem>
   </React.Fragment>
 );
