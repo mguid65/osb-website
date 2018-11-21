@@ -493,8 +493,10 @@ func (db *mysqlDB) AddUser(user *User) (int64, error) {
 
 	hash := sha512.New()
 	hash.Write([]byte(user.Password))
-
-	r, err := addUser.ExecContext(ctx, user.Name, user.Email, hex.EncodeToString(hash.Sum(nil)))
+	sum := hex.EncodeToString(hash.Sum(nil))
+	fmt.Printf("Adding User With:\nUsername: %s\nEmail: %s\n PasswordHash: %s\n",
+		user.Name, user.Email, sum)
+	r, err := addUser.ExecContext(ctx, user.Name, user.Email, sum)
 	if err != nil {
 		return 0, fmt.Errorf("mysql: add user: %v", err)
 	}

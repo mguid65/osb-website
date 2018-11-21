@@ -28,6 +28,7 @@ func testUserDB(t *testing.T, db database.UserDatabase) {
 	if err != nil {
 		t.Error(err)
 	}
+
 	if got, want := gotUser.Password, user.Password; got != want {
 		t.Errorf("Update user: got %q, want %q", got, want)
 	}
