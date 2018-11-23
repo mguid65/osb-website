@@ -11,25 +11,25 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 
 const headers = [
   {
-    id: "ResultAlias",
+    id: "username",
     numeric: false,
     disablePadding: true,
-    label: "User"
+    label: "Username"
   },
   {
-    id: "ID",
+    id: "rank",
     numeric: true,
     disablePadding: false,
     label: "Rank"
   },
   {
-    id: "TotalTime",
+    id: "totalTime",
     numeric: true,
     disablePadding: false,
     label: "Time (s)"
   },
   {
-    id: "TotalScore",
+    id: "totalScore",
     numeric: true,
     disablePadding: false,
     label: "Score"

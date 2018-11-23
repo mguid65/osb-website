@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { Paper } from "@material-ui/core";
-import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
   root: {

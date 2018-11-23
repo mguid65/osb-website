@@ -54,16 +54,16 @@ class Leaderboard extends Component {
     orderBy: "score",
     selected: [],
     data: [],
-    user: [],
+    users: [],
     loading: true,
     page: 0,
     rowsPerPage: 5
   };
-  
+
   componentDidMount = async () => {
     const data = await getData();
     await sleep(1000);
-    this.setState({ data});
+    this.setState({ data });
 
     const user = await getUserNames();
     await sleep(1000);
@@ -114,19 +114,26 @@ class Leaderboard extends Component {
       getData().then(scores => this.setState({ data: scores }))
     );
     sleep(1000).then(() =>
-      getUserNames().then(users => this.setState({ user: users, loading: false }))
+      getUserNames().then(users => this.setState({ users, loading: false }))
     );
   };
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
-  render() { 
-
+  render() {
     const { classes } = this.props;
-    const { data, user, order, orderBy, rowsPerPage, page, loading } = this.state;
+    const {
+      data,
+      users,
+      order,
+      orderBy,
+      rowsPerPage,
+      page,
+      loading
+    } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
-    console.log(user);
+
     return (
       <Paper className={classes.root} elevation={1}>
         <LeaderboardToolbar onRefresh={this.handleRefresh} />
@@ -150,9 +157,22 @@ class Leaderboard extends Component {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((data, index) => {
                       const isSelected = this.isSelected(data.ID);
+                      const result = {
+                        username: users.find(e => e.ID === data.UserID).Name,
+                        rank: index + page * rowsPerPage + 1,
+                      };
+
+                      data.scores.map(score => {
+                        if (score.name === "total") {
+                          result.totalTime = score.time;
+                          result.totalScore = score.score;
+                        } else {
+                          result.details.push(score);
+                        }
+                      });
+
                       return (
-                        <React.Fragment key={user.find(function(e) {
-                                return e.ID == data.UserID }).Name}>
+                        <React.Fragment key={data.ID}>
                           <TableRow
                             hover
                             onClick={event => this.handleClick(event, data.ID)}
@@ -170,12 +190,11 @@ class Leaderboard extends Component {
                               scope="row"
                               padding="none"
                             >
-                              {user.find(function(e) {
-                                return e.ID == data.UserID }).Name}
+                              {result.username}
                             </TableCell>
-                            <TableCell numeric>{(index + (page * rowsPerPage)) + 1}</TableCell>
-                            <TableCell numeric>{data.scores[5].time}</TableCell>
-                            <TableCell numeric>{data.scores[5].score}</TableCell>
+                            <TableCell numeric>{result.rank}</TableCell>
+                            <TableCell numeric>{result.totalTime}</TableCell>
+                            <TableCell numeric>{result.totalScore}</TableCell>
                           </TableRow>
                         </React.Fragment>
                       );
