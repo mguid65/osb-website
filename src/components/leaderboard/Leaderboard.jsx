@@ -32,7 +32,6 @@ const leaderboardStyles = theme => ({
   root: {
     maxWidth: "90vw",
     margin: "auto",
-    marginTop: theme.spacing.unit * 3
   },
   table: {
     minWidth: 550,

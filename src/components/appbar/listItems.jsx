@@ -11,31 +11,6 @@ import {
   NavLink,
 } from "react-router-dom";
 
-export const mainListItems = (
-  <React.Fragment>
-    <NavLink to="/"><ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Dashboard" />
-    </ListItem>
-    </NavLink>
-    <ListItem button>
-      <ListItemIcon>
-        <DownloadIcon />
-      </ListItemIcon>
-      <ListItemText primary="Download" />
-    </ListItem>
-    <NavLink to="/register"><ListItem button>
-      <ListItemIcon>
-	<PersonAdd />
-      </ListItemIcon>
-      <ListItemText primary="Register" />
-    </ListItem>
-    </NavLink>
-  </React.Fragment>
-);
-
 export const secondaryListItems = (
   <React.Fragment>
     <ListSubheader inset>Links</ListSubheader>

@@ -11,11 +11,12 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import { secondaryListItems } from "./listItems";
 import Leaderboard from "../leaderboard/Leaderboard";
 import Register from "../registration/Register";
+import Download from "../download/Download";
 import MenuBar from "./MenuBar";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import DashboardIcon from "@material-ui/icons/Dashboard";
+import InsertChartIcon from "@material-ui/icons/InsertChart";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PersonAdd from "@material-ui/icons/PersonAdd";
 
@@ -148,17 +149,19 @@ class Dashboard extends Component {
 	    <NavLink to="/">
              <ListItem button>
               <ListItemIcon>
-               <DashboardIcon />
+               <InsertChartIcon />
               </ListItemIcon>
-              <ListItemText primary="Dashboard" />
+              <ListItemText primary="Leaderboard" />
              </ListItem>
             </NavLink>
+	    <NavLink to="/downloads">
             <ListItem button>
              <ListItemIcon>
               <DownloadIcon />
              </ListItemIcon>
              <ListItemText primary="Download" />
             </ListItem>
+	    </NavLink>
             <NavLink to="/register">
              <ListItem button>
               <ListItemIcon>
@@ -176,6 +179,7 @@ class Dashboard extends Component {
             <div className={classes.tableContainer}>
 	      <Route exact path="/" component={Leaderboard}/>
 	      <Route path="/register" component={Register}/>
+              <Route path="/downloads" component={Download}/>
             </div>
           </main>
         </div>

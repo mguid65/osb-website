@@ -11,24 +11,26 @@ import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import CardContent from '@material-ui/core/CardContent';
 
 const styles = theme => ({
   root: {
     maxWidth: "90vw",
-    margin: "auto",
-    marginTop: theme.spacing.unit * 3
+    ...theme.mixins.gutters(),
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
   },
   container: {
     display: 'flex',
     flexWrap: 'wrap',
   },
-  margin: {
-    margin: theme.spacing.unit,
-  },
   textField: {
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     width: 200,
+  },
+  title: {
+    flex: "0 0 auto"
   }
 });
 
@@ -46,9 +48,9 @@ class Register extends Component {
 
     return (
       <Paper className={ classes.root } elevation={1}>
-      <Typography variant="h5" component="h3">
-       Registration
-      </Typography>
+        <Typography gutterBottom variant="h6" component="h2">
+          Registration
+        </Typography>
       <form className={ classes.container } action="/api/users/register" method="post">
         <TextField
 	  name="email"
