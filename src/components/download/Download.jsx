@@ -6,8 +6,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  DownloadIcon
 } from "@material-ui/core";
+import DownloadIcon from "@material-ui/icons/FontDownload";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 
