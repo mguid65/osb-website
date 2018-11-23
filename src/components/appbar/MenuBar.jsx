@@ -8,13 +8,24 @@ import Badge from "@material-ui/core/Badge";
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import PersonAdd from "@material-ui/icons/PersonAdd";
+import {deepOrange500} from '@material-ui/core/colors';
+import MuiThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { createMuiTheme } from '@material-ui/core/styles';
+
+const muiTheme = createMuiTheme({
+  palette: {
+    primary1color: deepOrange500,
+  }
+});
 
 const MenuBar = props => {
   const { classes, state, onClick } = props;
   return (
+    <MuiThemeProvider theme={muiTheme}>
     <AppBar
       position="absolute"
       className={classNames(classes.appBar, state.open && classes.appBarShift)}
+      color="primary"
     >
       <Toolbar disableGutters={!state.open} className={classes.toolbar}>
         <IconButton
@@ -38,6 +49,7 @@ const MenuBar = props => {
         </Typography>
       </Toolbar>
     </AppBar>
+    </MuiThemeProvider>
   );
 };
 

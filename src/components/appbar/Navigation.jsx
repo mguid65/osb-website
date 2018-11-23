@@ -8,11 +8,23 @@ import List from "@material-ui/core/List";
 import Divider from "@material-ui/core/Divider";
 import IconButton from "@material-ui/core/IconButton";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import { mainListItems, secondaryListItems } from "./listItems";
+import { secondaryListItems } from "./listItems";
 import Leaderboard from "../leaderboard/Leaderboard";
 import Register from "../registration/Register";
 import MenuBar from "./MenuBar";
+import ListItem from "@material-ui/core/ListItem";
+import ListItemIcon from "@material-ui/core/ListItemIcon";
+import ListItemText from "@material-ui/core/ListItemText";
+import DashboardIcon from "@material-ui/icons/Dashboard";
+import DownloadIcon from "@material-ui/icons/CloudDownload";
+import PersonAdd from "@material-ui/icons/PersonAdd";
 
+import {
+  Route,
+  NavLink,
+  HashRouter,
+} from "react-router-dom";
+ 
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -106,6 +118,7 @@ class Dashboard extends Component {
     const { classes } = this.props;
 
     return (
+      <HashRouter>
       <React.Fragment>
         <CssBaseline />
         <div className={classes.root}>
@@ -130,19 +143,44 @@ class Dashboard extends Component {
               </IconButton>
             </div>
             <Divider />
-            <List>{mainListItems}</List>
+            <List>
+            <React.Fragment>
+	    <NavLink to="/">
+             <ListItem button>
+              <ListItemIcon>
+               <DashboardIcon />
+              </ListItemIcon>
+              <ListItemText primary="Dashboard" />
+             </ListItem>
+            </NavLink>
+            <ListItem button>
+             <ListItemIcon>
+              <DownloadIcon />
+             </ListItemIcon>
+             <ListItemText primary="Download" />
+            </ListItem>
+            <NavLink to="/register">
+             <ListItem button>
+              <ListItemIcon>
+               <PersonAdd />
+              </ListItemIcon>
+              <ListItemText primary="Register" />
+             </ListItem>
+            </NavLink>
+            </React.Fragment></List>
             <Divider />
             <List>{secondaryListItems}</List>
           </Drawer>
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
             <div className={classes.tableContainer}>
-	      <Register />
-	      <Leaderboard />
+	      <Route exact path="/" component={Leaderboard}/>
+	      <Route path="/register" component={Register}/>
             </div>
           </main>
         </div>
       </React.Fragment>
+      </HashRouter>
     );
   }
 }

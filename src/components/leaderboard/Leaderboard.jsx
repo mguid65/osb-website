@@ -149,15 +149,13 @@ class Leaderboard extends Component {
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((data, index) => {
-                      const isSelected = this.isSelected(user.find(function(e) {
-				return e.ID == data.UserID }).Name);
+                      const isSelected = this.isSelected(data.ID);
                       return (
                         <React.Fragment key={user.find(function(e) {
                                 return e.ID == data.UserID }).Name}>
                           <TableRow
                             hover
-                            onClick={event => this.handleClick(event, user.find(function(e) {
-                                return e.ID == data.UserID }).Name)}
+                            onClick={event => this.handleClick(event, data.ID)}
                             role="checkbox"
                             aria-checked={isSelected}
                             tabIndex={-1}
