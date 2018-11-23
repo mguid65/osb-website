@@ -1,12 +1,12 @@
 package handlers
 
 import (
-        "crypto/sha512"
+	"crypto/sha512"
 	"encoding/hex"
-	"fmt"
+	"html/template"
+	"io"
 	"net/http"
 	"strconv"
-	"io"
 	"strings"
 
 	"github.com/gorilla/mux"
@@ -80,7 +80,6 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 
 		var user database.User
 		for k, v := range r.Form {
-			//fmt.Println(k, v)
 			switch k {
 			case "email":
 				user.Email = v[0]
@@ -101,15 +100,31 @@ func AddUser(db database.UserDatabase) http.HandlerFunc {
 			return
 		}
 
-		fmt.Fprintf(w, "<!DOCTYPE html><html><head>" +
-			       "<script>setTimeout(\"location.href='https://opensystembench.com';\", 2500);" +
-			       "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,500\">" +
-                               "</script>" +
-			       "</head>" +
-			       "<body class=\"mdc-typography\">" +
-			       "Successfully Added User %s <br><br><a href='https://opensystembench.com'>" +
-			       "Please click here if you are not automatically redirected" +
-			       "</a></body></html>", user.Name)
+		tmpl, err := template.New("new user").Parse(`
+			<!DOCTYPE html>
+			<html>
+			<head>
+				<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+				<script>
+					setTimeout(() => location.href = 'https://opensystembench.com', 2500);
+				</script>
+			</head>
+			<body class="mdc-typography">
+				<p>Successfully added user: {{ .Name }}</p>
+				<a href='https://opensystembench.com'>
+					Please click here if you are not automatically redirected.
+				</a>
+			</body>
+			</html>
+		`)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := tmpl.Execute(w, user); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	}
 }
 

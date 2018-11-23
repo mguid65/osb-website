@@ -29,26 +29,26 @@ type User struct {
 	Password string // user's hashed password
 }
 
-// UserExternal represents a public view of a user in system
+// UserExternal represents a public view of a user.
 type UserExternal struct {
-        ID       int64  // user's ID
-        Name     string // user's username
+	ID   int64  // user's ID
+	Name string // user's username
 }
 
 // scanUser returns a user from a database row.
 func scanUserExternal(s rowScanner) (*UserExternal, error) {
-        var (
-                id       int64
-                name     string
-        )
-        if err := s.Scan(&id, &name); err != nil {
-                return nil, err
-        }
-        userExt := &UserExternal{
-                ID:       id,
-                Name:     name,
-        }
-        return userExt, nil
+	var (
+		id   int64
+		name string
+	)
+	if err := s.Scan(&id, &name); err != nil {
+		return nil, err
+	}
+	userExt := &UserExternal{
+		ID:   id,
+		Name: name,
+	}
+	return userExt, nil
 }
 
 func scanUser(s rowScanner) (*User, error) {

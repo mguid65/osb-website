@@ -23,17 +23,17 @@ func Handler(db database.OSBDatabase) *mux.Router {
 func addRootHandler(r *mux.Router) {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./build/static/"))))
 	r.PathPrefix("/service-worker.js").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-                http.ServeFile(w, r, "./build/service-worker.js")
-        })
-        r.PathPrefix("/manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-                http.ServeFile(w, r, "./build/manifest.json")
-        })
-        r.PathPrefix("/favicon.ico").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-                http.ServeFile(w, r, "./build/favicon.ico")
-        })
-        r.PathPrefix("/asset-manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-                http.ServeFile(w, r, "./build/asset-manifest.json")
-        })
+		http.ServeFile(w, r, "./build/service-worker.js")
+	})
+	r.PathPrefix("/manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/manifest.json")
+	})
+	r.PathPrefix("/favicon.ico").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/favicon.ico")
+	})
+	r.PathPrefix("/asset-manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/asset-manifest.json")
+	})
 	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./build/index.html")
 	})
