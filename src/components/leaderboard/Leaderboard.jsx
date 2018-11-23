@@ -128,7 +128,7 @@ class Leaderboard extends Component {
       rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
     console.log(user);
     return (
-      <Paper className={classes.root}>
+      <Paper className={classes.root} elevation={1}>
         <LeaderboardToolbar onRefresh={this.handleRefresh} />
         <div className={classes.tableWrapper}>
           <Table className={classes.table} aria-labelledby="tableTitle">

@@ -10,6 +10,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Visibility from '@material-ui/icons/Visibility';
 import VisibilityOff from '@material-ui/icons/VisibilityOff';
 import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
   root: {
@@ -44,7 +45,10 @@ class Register extends Component {
     const { classes } = this.props;
 
     return (
-      <Paper className={ classes.root }>
+      <Paper className={ classes.root } elevation={1}>
+      <Typography variant="h5" component="h3">
+       Registration
+      </Typography>
       <form className={ classes.container } action="/api/users/register" method="post">
         <TextField
 	  name="email"
@@ -86,6 +90,9 @@ class Register extends Component {
         />
         <Button size="small" type="submit" className={classes.margin}>Register</Button>
       </form>
+        <Typography component="p">
+          Register an account with OpenSystemBench for score submission from our desktop clients.
+        </Typography>
       </Paper>
     );
   }
