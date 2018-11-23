@@ -17,7 +17,7 @@ const headers = [
     label: "User"
   },
   {
-    id: "ID",
+    id: "Rank",
     numeric: true,
     disablePadding: false,
     label: "Rank"
