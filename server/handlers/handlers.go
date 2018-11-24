@@ -2,7 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gorilla/mux"
 
@@ -21,23 +24,20 @@ func Handler(db database.OSBDatabase) *mux.Router {
 }
 
 func addRootHandler(r *mux.Router) {
-	r.PathPrefix("/static/css/").Handler(http.StripPrefix("/static/css/", http.FileServer(http.Dir("./build/static/css"))))
-	r.PathPrefix("/static/js/").Handler(http.StripPrefix("/static/js/", http.FileServer(http.Dir("./build/static/js"))))
-	r.PathPrefix("/service-worker.js").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/service-worker.js")
+	build := filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "mguid65", "osb-website", "build")
+	err := filepath.Walk(build, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		prefix := fmt.Sprintf("/%s", info.Name())
+		r.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, path)
+		})
+		return nil
 	})
-	r.PathPrefix("/manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/manifest.json")
-	})
-	r.PathPrefix("/favicon.ico").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/favicon.ico")
-	})
-	r.PathPrefix("/asset-manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/asset-manifest.json")
-	})
-	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/index.html")
-	})
+	if err != nil {
+		panic(err)
+	}
 }
 
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {
