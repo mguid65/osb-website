@@ -3,8 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/gorilla/mux"
 
@@ -29,21 +27,12 @@ func serveFile(name string) http.HandlerFunc {
 }
 
 func addRootHandler(r *mux.Router) {
-	var (
-		buildDir      = filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "mguid65", "osb-website", "build")
-		index         = filepath.Join(buildDir, "index.html")
-		serviceWorker = filepath.Join(buildDir, "service-worker.js")
-		manifest      = filepath.Join(buildDir, "manifest.json")
-		favicon       = filepath.Join(buildDir, "favicon.ico")
-		assetManifest = filepath.Join(buildDir, "asset-manifest.json")
-		staticDir     = filepath.Join(buildDir, "static")
-	)
-	r.HandleFunc("/", serveFile(index))
-	r.HandleFunc("/service-worker.js", serveFile(serviceWorker))
-	r.HandleFunc("/manifest.json", serveFile(manifest))
-	r.HandleFunc("/favicon.ico", serveFile(favicon))
-	r.HandleFunc("/asset-manifest.json", serveFile(assetManifest))
-	r.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
+	r.PathPrefix("/").HandlerFunc(serveFile("./build/index.html"))
+	r.PathPrefix("/service-worker.js").HandlerFunc(serveFile("./build/service-worker.js"))
+	r.PathPrefix("/manifest.json").HandlerFunc(serveFile("./build/manifest.json"))
+	r.PathPrefix("/favicon.ico").HandlerFunc(serveFile("./build/favicon.ico"))
+	r.PathPrefix("/asset-manifest.json").HandlerFunc(serveFile("./build/asset-manifest.json"))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./build/static"))))
 }
 
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {
