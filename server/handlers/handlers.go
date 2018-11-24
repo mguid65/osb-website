@@ -3,6 +3,8 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gorilla/mux"
 
@@ -20,23 +22,28 @@ func Handler(db database.OSBDatabase) *mux.Router {
 	return r
 }
 
+func serveFile(name string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, name)
+	}
+}
+
 func addRootHandler(r *mux.Router) {
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./build/static/"))))
-	r.PathPrefix("/service-worker.js").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/service-worker.js")
-	})
-	r.PathPrefix("/manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/manifest.json")
-	})
-	r.PathPrefix("/favicon.ico").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/favicon.ico")
-	})
-	r.PathPrefix("/asset-manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/asset-manifest.json")
-	})
-	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./build/index.html")
-	})
+	var (
+		buildDir      = filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "mguid65", "osb-website", "build")
+		index         = filepath.Join(buildDir, "index.html")
+		serviceWorker = filepath.Join(buildDir, "service-worker.js")
+		manifest      = filepath.Join(buildDir, "manifest.json")
+		favicon       = filepath.Join(buildDir, "favicon.ico")
+		assetManifest = filepath.Join(buildDir, "asset-manifest.json")
+		staticDir     = filepath.Join(buildDir, "static")
+	)
+	r.HandleFunc("/", serveFile(index))
+	r.HandleFunc("/service-worker.js", serveFile(serviceWorker))
+	r.HandleFunc("/manifest.json", serveFile(manifest))
+	r.HandleFunc("/favicon.ico", serveFile(favicon))
+	r.HandleFunc("/asset-manifest.json", serveFile(assetManifest))
+	r.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
 }
 
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {
