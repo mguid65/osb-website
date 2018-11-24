@@ -7,7 +7,7 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@material-ui/core";
-import DownloadIcon from "@material-ui/icons/FontDownload";
+import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PropTypes from "prop-types";
 import { withStyles } from "@material-ui/core/styles";
 
@@ -48,7 +48,7 @@ class Download extends Component {
           Ubuntu 18.04
         </Typography>
         <List>
-          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.tar">
+          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.tar" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />
@@ -56,7 +56,7 @@ class Download extends Component {
               <ListItemText>v1.0.0 .tar</ListItemText>
             </ListItem>
           </a>
-          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.tar.gz">
+          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.tar.gz" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />
@@ -64,7 +64,7 @@ class Download extends Component {
               <ListItemText>v1.0.0 .tar.gz</ListItemText>
             </ListItem>
           </a>
-          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.zip">
+          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.zip" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />

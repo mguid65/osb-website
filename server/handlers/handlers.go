@@ -21,6 +21,7 @@ func Handler(db database.OSBDatabase) *mux.Router {
 }
 
 func addRootHandler(r *mux.Router) {
+        r.PathPrefix("/downloads/").Handler(http.StripPrefix("/downloads/", http.FileServer(http.Dir("./build/release"))))
 	r.PathPrefix("/static/css/").Handler(http.StripPrefix("/static/css/", http.FileServer(http.Dir("./build/static/css"))))
 	r.PathPrefix("/static/js/").Handler(http.StripPrefix("/static/js/", http.FileServer(http.Dir("./build/static/js"))))
 	r.PathPrefix("/service-worker.js").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
