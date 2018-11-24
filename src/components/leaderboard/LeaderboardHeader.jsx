@@ -11,7 +11,7 @@ import ExpandMore from "@material-ui/icons/ExpandMore";
 
 const headers = [
   {
-    id: "username",
+    id: "user",
     numeric: false,
     disablePadding: true,
     label: "Username"

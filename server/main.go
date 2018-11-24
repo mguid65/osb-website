@@ -34,13 +34,14 @@ func main() {
 	}
 	defer db.Close()
 
-	var (
-		addr     = ":443"
-		certFile = "/home/osbadmin/cert/key.pem"
-		keyFile  = "/home/osbadmin/cert/key.key"
-		handler  = handlers.Handler(db)
-	)
+	// var (
+	// 	addr     = ":443"
+	// 	certFile = "/home/osbadmin/cert/key.pem"
+	// 	keyFile  = "/home/osbadmin/cert/key.key"
+	// 	handler  = handlers.Handler(db)
+	// )
 
-	fmt.Println("Listening on https://localhost:443/")
-	log.Fatal(http.ListenAndServeTLS(addr, certFile, keyFile, handler))
+	// fmt.Println("Listening on https://localhost:443/")
+	// log.Fatal(http.ListenAndServeTLS(addr, certFile, keyFile, handler))
+	http.ListenAndServe(":8080", handlers.Handler(db))
 }

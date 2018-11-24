@@ -15,23 +15,23 @@ import { ExpandLess, ExpandMore } from "@material-ui/icons";
 import LeaderboardHeader from "./LeaderboardHeader";
 import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
-import { sleep, getData, getUserNames, stableSort, getSorting } from "./data";
+import { getData, stableSort, getSorting } from "./data";
 
-const ScoreMetaData = ({ classes, name, time, score }) => {
-  return (
-    <TableRow className={classes}>
-      <TableCell colSpan={2} />
-      <TableCell numeric>{name}</TableCell>
-      <TableCell numeric>{time}</TableCell>
-      <TableCell numeric>{score}</TableCell>
-    </TableRow>
-  );
-};
+// const ScoreMetaData = ({ classes, name, time, score }) => {
+//   return (
+//     <TableRow className={classes}>
+//       <TableCell colSpan={2} />
+//       <TableCell numeric>{name}</TableCell>
+//       <TableCell numeric>{time}</TableCell>
+//       <TableCell numeric>{score}</TableCell>
+//     </TableRow>
+//   );
+// };
 
 const leaderboardStyles = theme => ({
   root: {
     maxWidth: "90vw",
-    margin: "auto",
+    margin: "auto"
   },
   table: {
     minWidth: 550,
@@ -53,20 +53,43 @@ class Leaderboard extends Component {
     orderBy: "score",
     selected: [],
     data: [],
-    users: [],
     loading: true,
     page: 0,
     rowsPerPage: 5
   };
 
   componentDidMount = async () => {
-    const data = await getData();
-    await sleep(1000);
-    this.setState({ data });
+    const resultsRes = await fetch("http://localhost:8080/api/results");
+    const results = await resultsRes.json();
+    const usersRes = await fetch("http://localhost:8080/api/users");
+    const users = await usersRes.json();
+    const specsRes = await fetch("http://localhost:8080/api/specs");
+    const specs = await specsRes.json();
 
-    const user = await getUserNames();
-    await sleep(1000);
-    this.setState({ user, loading: false });
+    const d = results.map(result => {
+      const total = result.scores.find(score => score.name === "total");
+      return {
+        id: result.ID,
+        totalTime: total.time,
+        totalScore: total.score,
+        user: users.find(user => user.ID === result.UserID).Name,
+        scores: result.scores,
+        specs: specs.find(spec => spec.ResultID === result.ID)
+      };
+    });
+
+    const sorted = d.sort((a, b) => {
+      if (a.totalScore < b.totalScore) return 1;
+      else if (b.totalScore < a.totalScore) return 1;
+      else return 0;
+    });
+
+    const ranked = sorted.map((result, index) => {
+      result.rank = index + 1;
+      return result;
+    });
+
+    this.setState({ data: ranked, loading: false });
   };
 
   handleRequestSort = (event, property) => {
@@ -107,29 +130,17 @@ class Leaderboard extends Component {
     this.setState({ rowsPerPage: event.target.value });
   };
 
-  handleRefresh = () => {
-    this.setState({ loading: true });
-    sleep(1000).then(() =>
-      getData().then(scores => this.setState({ data: scores }))
-    );
-    sleep(1000).then(() =>
-      getUserNames().then(users => this.setState({ users, loading: false }))
-    );
+  handleRefresh = async () => {
+    this.setState({ loading: true});
+    const ranked = await getData();
+    this.setState({ data: ranked, loading: false });
   };
 
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
   render() {
     const { classes } = this.props;
-    const {
-      data,
-      users,
-      order,
-      orderBy,
-      rowsPerPage,
-      page,
-      loading
-    } = this.state;
+    const { data, order, orderBy, rowsPerPage, page, loading } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);
 
@@ -154,21 +165,8 @@ class Leaderboard extends Component {
                 <React.Fragment>
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((data, index) => {
+                    .map(data => {
                       const isSelected = this.isSelected(data.ID);
-                      const result = {
-                        username: users.find(e => e.ID === data.UserID).Name,
-                        rank: index + page * rowsPerPage + 1,
-                      };
-
-                      data.scores.map(score => {
-                        if (score.name === "total") {
-                          result.totalTime = score.time;
-                          result.totalScore = score.score;
-                        } else {
-                          result.details.push(score);
-                        }
-                      });
 
                       return (
                         <React.Fragment key={data.ID}>
@@ -189,11 +187,11 @@ class Leaderboard extends Component {
                               scope="row"
                               padding="none"
                             >
-                              {result.username}
+                              {data.user}
                             </TableCell>
-                            <TableCell numeric>{result.rank}</TableCell>
-                            <TableCell numeric>{result.totalTime}</TableCell>
-                            <TableCell numeric>{result.totalScore}</TableCell>
+                            <TableCell numeric>{data.rank}</TableCell>
+                            <TableCell numeric>{data.totalTime}</TableCell>
+                            <TableCell numeric>{data.totalScore}</TableCell>
                           </TableRow>
                         </React.Fragment>
                       );

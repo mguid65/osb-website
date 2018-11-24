@@ -3,13 +3,7 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import ListSubheader from "@material-ui/core/ListSubheader";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import DownloadIcon from "@material-ui/icons/CloudDownload";
 import SvgIcon from "@material-ui/core/SvgIcon";
-import PersonAdd from "@material-ui/icons/PersonAdd";
-import {
-  NavLink,
-} from "react-router-dom";
 
 export const secondaryListItems = (
   <React.Fragment>
