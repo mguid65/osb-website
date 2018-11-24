@@ -3,10 +3,13 @@
  */
 async function getData() {
   const resultsRes = await fetch("https://opensystembench.com/api/results");
-  const results = await resultsRes.json();
   const usersRes = await fetch("https://opensystembench.com/api/users");
-  const users = await usersRes.json();
   const specsRes = await fetch("https://opensystembench.com/api/specs");
+  // const resultsRes = await fetch("http://localhost:8080/api/results");
+  // const usersRes = await fetch("http://localhost:8080/api/users");
+  // const specsRes = await fetch("http://localhost:8080/api/specs");
+  const results = await resultsRes.json();
+  const users = await usersRes.json();
   const specs = await specsRes.json();
 
   const d = results.map(result => {
@@ -24,7 +27,7 @@ async function getData() {
 
   const sorted = d.sort((a, b) => {
     if (a.totalScore < b.totalScore) return 1;
-    else if (b.totalScore < a.totalScore) return 1;
+    else if (b.totalScore < a.totalScore) return -1;
     else return 0;
   });
 
