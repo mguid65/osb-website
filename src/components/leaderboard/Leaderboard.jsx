@@ -59,36 +59,8 @@ class Leaderboard extends Component {
   };
 
   componentDidMount = async () => {
-    const resultsRes = await fetch("http://localhost:8080/api/results");
-    const results = await resultsRes.json();
-    const usersRes = await fetch("http://localhost:8080/api/users");
-    const users = await usersRes.json();
-    const specsRes = await fetch("http://localhost:8080/api/specs");
-    const specs = await specsRes.json();
-
-    const d = results.map(result => {
-      const total = result.scores.find(score => score.name === "total");
-      return {
-        id: result.ID,
-        totalTime: total.time,
-        totalScore: total.score,
-        user: users.find(user => user.ID === result.UserID).Name,
-        scores: result.scores,
-        specs: specs.find(spec => spec.ResultID === result.ID)
-      };
-    });
-
-    const sorted = d.sort((a, b) => {
-      if (a.totalScore < b.totalScore) return 1;
-      else if (b.totalScore < a.totalScore) return 1;
-      else return 0;
-    });
-
-    const ranked = sorted.map((result, index) => {
-      result.rank = index + 1;
-      return result;
-    });
-
+    this.setState({ loading: true });
+    const ranked = await getData();
     this.setState({ data: ranked, loading: false });
   };
 
