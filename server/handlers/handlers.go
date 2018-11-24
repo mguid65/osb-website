@@ -20,19 +20,26 @@ func Handler(db database.OSBDatabase) *mux.Router {
 	return r
 }
 
-func serveFile(name string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, name)
-	}
-}
 
 func addRootHandler(r *mux.Router) {
-	r.PathPrefix("/").HandlerFunc(serveFile("./build/index.html"))
-	r.PathPrefix("/service-worker.js").HandlerFunc(serveFile("./build/service-worker.js"))
-	r.PathPrefix("/manifest.json").HandlerFunc(serveFile("./build/manifest.json"))
-	r.PathPrefix("/favicon.ico").HandlerFunc(serveFile("./build/favicon.ico"))
-	r.PathPrefix("/asset-manifest.json").HandlerFunc(serveFile("./build/asset-manifest.json"))
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./build/static"))))
+	r.PathPrefix("/static/css/").Handler(http.StripPrefix("/static/css/", http.FileServer(http.Dir("./build/static/css/"))))
+	r.PathPrefix("/static/js/").Handler(http.StripPrefix("/static/js/", http.FileServer(http.Dir("./build/static/js/"))))
+	r.PathPrefix("/service-worker.js").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/service-worker.js")
+	})
+	r.PathPrefix("/manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/manifest.json")
+	})
+	r.PathPrefix("/favicon.ico").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/favicon.ico")
+	})
+	r.PathPrefix("/asset-manifest.json").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./build/asset-manifest.json")
+	})
+	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		http.ServeFile(w, r, "./build/index.html")
+	})
 }
 
 func addUserHandlers(r *mux.Router, db database.OSBDatabase) {

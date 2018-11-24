@@ -10,7 +10,8 @@ async function getData() {
   const specs = await specsRes.json();
 
   const d = results.map(result => {
-    const total = result.scores.find(score => score.name === "total");
+    const total = result.scores.find(score => score.name === "Total");
+    console.log(result.scores)
     return {
       id: result.ID,
       totalTime: total.time,
