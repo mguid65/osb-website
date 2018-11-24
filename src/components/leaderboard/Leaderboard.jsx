@@ -59,7 +59,6 @@ class Leaderboard extends Component {
   };
 
   componentDidMount = async () => {
-    this.setState({ loading: true });
     const ranked = await getData();
     this.setState({ data: ranked, loading: false });
   };
@@ -103,7 +102,7 @@ class Leaderboard extends Component {
   };
 
   handleRefresh = async () => {
-    this.setState({ loading: true});
+    this.setState({ loading: true });
     const ranked = await getData();
     this.setState({ data: ranked, loading: false });
   };
