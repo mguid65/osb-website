@@ -166,10 +166,12 @@ class Leaderboard extends Component {
                                 </TableRow>
                               );
                             })}
-                          {isSelected && data.specs != null && (
+                          {isSelected && data.specs != null && data.specs.specs != null && (
                             <TableRow className={classes}>
-                              <TableCell colSpan={3}>
-                                {data.specs.specs}
+                              <TableCell colSpan={5}>
+                                {data.specs.specs.vendor} {data.specs.specs.model} {data.specs.specs.speed}
+                                {data.specs.specs.threads} {data.specs.specs.overclocked} {data.specs.specs.byte_order}
+                                {data.specs.specs.physical_mem} {data.specs.specs.virtual_mem} {data.specs.specs.swap_mem}
                               </TableCell>
                             </TableRow>
                           )}
