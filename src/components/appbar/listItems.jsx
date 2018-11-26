@@ -2,12 +2,10 @@ import React from "react";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
-import ListSubheader from "@material-ui/core/ListSubheader";
 import SvgIcon from "@material-ui/core/SvgIcon";
 
 export const secondaryListItems = (
   <React.Fragment>
-    <ListSubheader inset>Links</ListSubheader>
     <a
       href="https://github.com/mguid65/OpenSystemBench"
       style={{ textDecoration: "none" }}
