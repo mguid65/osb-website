@@ -48,7 +48,7 @@ class Download extends Component {
           Ubuntu 18.04
         </Typography>
         <List>
-          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.tar" download>
+          <a href="https://opensystembench.com/downloads/release-1.0.0-Ubuntu-1804.tar" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />
@@ -56,7 +56,7 @@ class Download extends Component {
               <ListItemText>v1.0.0 .tar</ListItemText>
             </ListItem>
           </a>
-          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.tar.gz" download>
+          <a href="https://opensystembench.com/downloads/release-1.0.0-Ubuntu-1804.tar.gz" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />
@@ -64,7 +64,7 @@ class Download extends Component {
               <ListItemText>v1.0.0 .tar.gz</ListItemText>
             </ListItem>
           </a>
-          <a href="https://opensystembench.com/release/release-1.0.0-Ubuntu-1804.zip" download>
+          <a href="https://opensystembench.com/downloads/release-1.0.0-Ubuntu-1804.zip" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />
@@ -77,7 +77,7 @@ class Download extends Component {
           Windows 32-bit
         </Typography>
         <List>
-          <a href="https://opensystembench.com/release/OpenSystemBenchWIN32.zip" download>
+          <a href="https://opensystembench.com/downloads/OpenSystemBenchWIN32.zip" download>
             <ListItem>
               <ListItemIcon>
                 <DownloadIcon />
