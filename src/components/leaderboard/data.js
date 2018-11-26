@@ -5,9 +5,6 @@ async function getData() {
   const resultsRes = await fetch("https://opensystembench.com/api/results");
   const usersRes = await fetch("https://opensystembench.com/api/users");
   const specsRes = await fetch("https://opensystembench.com/api/specs");
-  // const resultsRes = await fetch("http://localhost:8080/api/results");
-  // const usersRes = await fetch("http://localhost:8080/api/users");
-  // const specsRes = await fetch("http://localhost:8080/api/specs");
   const users = await usersRes.json();
   const results = await resultsRes.json();
   const specs = await specsRes.json();
