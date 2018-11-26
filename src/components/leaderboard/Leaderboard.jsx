@@ -72,7 +72,7 @@ class Leaderboard extends Component {
     data: [],
     loading: true,
     page: 0,
-    rowsPerPage: 5
+    rowsPerPage: 10
   };
 
   componentDidMount = async () => {
