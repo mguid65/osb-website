@@ -22,24 +22,36 @@ const Metadata = ({ classes, specs }) => {
     <React.Fragment>
       <TableRow classNames={classes}>
         <TableCell colSpan={3} numeric>
-          Vendor: {specs.vendor}
+          <strong>Vendor:</strong> {specs.vendor}
         </TableCell>
-        <TableCell numeric>Model: {specs.model}</TableCell>
-        <TableCell numeric>Clock Speed: {specs.speed}</TableCell>
+        <TableCell numeric>
+          <strong>Model:</strong> {specs.model}
+        </TableCell>
+        <TableCell numeric>
+          <strong>Clock Speed:</strong> {specs.speed}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell colSpan={3} numeric>
-          Threads: {specs.threads}
+          <strong>Threads:</strong> {specs.threads}
         </TableCell>
-        <TableCell numeric>Overclocked: {String(specs.overclocked)}</TableCell>
-        <TableCell numeric>Byte Order: {specs.speed}</TableCell>
+        <TableCell numeric>
+          <strong>Overclocked:</strong> {String(specs.overclocked)}
+        </TableCell>
+        <TableCell numeric>
+          <strong>Byte Order:</strong> {specs.speed}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell colSpan={3} numeric>
-          Physical Memory: {specs.physical}
+          <strong>Physical Memory:</strong> {specs.physical}
         </TableCell>
-        <TableCell numeric>Virtual Memory: {specs.virtual}</TableCell>
-        <TableCell numeric>Swap Memory: {specs.swap}</TableCell>
+        <TableCell numeric>
+          <strong>Virtual Memory:</strong> {specs.virtual}
+        </TableCell>
+        <TableCell numeric>
+          <strong>Swap Memory:</strong> {specs.swap}
+        </TableCell>
       </TableRow>
     </React.Fragment>
   );
@@ -47,8 +59,7 @@ const Metadata = ({ classes, specs }) => {
 
 const leaderboardStyles = theme => ({
   root: {
-    maxWidth: "90vw",
-    margin: "auto"
+    maxWidth: "90vw"
   },
   table: {
     minWidth: 550,

@@ -20,12 +20,8 @@ import InsertChartIcon from "@material-ui/icons/InsertChart";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PersonAdd from "@material-ui/icons/PersonAdd";
 
-import {
-  Route,
-  NavLink,
-  HashRouter,
-} from "react-router-dom";
- 
+import { Route, NavLink, HashRouter } from "react-router-dom";
+
 const drawerWidth = 240;
 
 const styles = theme => ({
@@ -99,6 +95,9 @@ const styles = theme => ({
   },
   tableContainer: {
     height: 320
+  },
+  menuText: {
+    textDecoration: "none"
   }
 });
 
@@ -120,70 +119,80 @@ class Dashboard extends Component {
 
     return (
       <HashRouter>
-      <React.Fragment>
-        <CssBaseline />
-        <div className={classes.root}>
-          <MenuBar
-            classes={classes}
-            state={this.state}
-            onClick={this.handleDrawerOpen}
-          />
-          <Drawer
-            variant="permanent"
-            classes={{
-              paper: classNames(
-                classes.drawerPaper,
-                !this.state.open && classes.drawerPaperClose
-              )
-            }}
-            open={this.state.open}
-          >
-            <div className={classes.toolbarIcon}>
-              <IconButton onClick={this.handleDrawerClose}>
-                <ChevronLeftIcon />
-              </IconButton>
-            </div>
-            <Divider />
-            <List>
-            <React.Fragment>
-	    <NavLink to="/">
-             <ListItem button>
-              <ListItemIcon>
-               <InsertChartIcon />
-              </ListItemIcon>
-              <ListItemText primary="Leaderboard" />
-             </ListItem>
-            </NavLink>
-	    <NavLink to="/downloads">
-            <ListItem button>
-             <ListItemIcon>
-              <DownloadIcon />
-             </ListItemIcon>
-             <ListItemText primary="Download" />
-            </ListItem>
-	    </NavLink>
-            <NavLink to="/register">
-             <ListItem button>
-              <ListItemIcon>
-               <PersonAdd />
-              </ListItemIcon>
-              <ListItemText primary="Register" />
-             </ListItem>
-            </NavLink>
-            </React.Fragment></List>
-            <Divider />
-            <List>{secondaryListItems}</List>
-          </Drawer>
-          <main className={classes.content}>
-            <div className={classes.appBarSpacer} />
-            <div className={classes.tableContainer}>
-	      <Route exact path="/" component={Leaderboard}/>
-	      <Route path="/register" component={Register}/>
-              <Route path="/downloads" component={Download}/>
-            </div>
-          </main>
-        </div>
-      </React.Fragment>
+        <React.Fragment>
+          <CssBaseline />
+          <div className={classes.root}>
+            <MenuBar
+              classes={classes}
+              state={this.state}
+              onClick={this.handleDrawerOpen}
+            />
+            <Drawer
+              variant="permanent"
+              classes={{
+                paper: classNames(
+                  classes.drawerPaper,
+                  !this.state.open && classes.drawerPaperClose
+                )
+              }}
+              open={this.state.open}
+            >
+              <div className={classes.toolbarIcon}>
+                <IconButton onClick={this.handleDrawerClose}>
+                  <ChevronLeftIcon />
+                </IconButton>
+              </div>
+              <Divider />
+              <List>
+                <React.Fragment>
+                  <NavLink to="/">
+                    <ListItem button>
+                      <ListItemIcon>
+                        <InsertChartIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        className={classes.menuText}
+                        primary="Leaderboard"
+                      />
+                    </ListItem>
+                  </NavLink>
+                  <NavLink to="/downloads">
+                    <ListItem button>
+                      <ListItemIcon>
+                        <DownloadIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        className={classes.menuText}
+                        primary="Download"
+                      />
+                    </ListItem>
+                  </NavLink>
+                  <NavLink to="/register">
+                    <ListItem button>
+                      <ListItemIcon>
+                        <PersonAdd />
+                      </ListItemIcon>
+                      <ListItemText
+                        className={classes.menuText}
+                        primary="Register"
+                      />
+                    </ListItem>
+                  </NavLink>
+                </React.Fragment>
+              </List>
+              <Divider />
+              <List>{secondaryListItems}</List>
+            </Drawer>
+            <main className={classes.content}>
+              <div className={classes.appBarSpacer} />
+              <div className={classes.tableContainer}>
+                <Route exact path="/" component={Leaderboard} />
+                <Route path="/register" component={Register} />
+                <Route path="/downloads" component={Download} />
+              </div>
+            </main>
+          </div>
+        </React.Fragment>
       </HashRouter>
     );
   }
