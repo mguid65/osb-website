@@ -179,7 +179,7 @@ class Leaderboard extends Component {
                             <ScoreMetaData
                               classes={classes}
                               scores={data.scores}
-                              specs={data.specs}
+                              specs={data.specs.specs}
                             />
                           )}
                         </React.Fragment>
