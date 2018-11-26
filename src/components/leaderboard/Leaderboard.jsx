@@ -17,23 +17,25 @@ import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
 import { getData, stableSort, getSorting } from "./data";
 
-const ScoreMetaData = ({ classes, scores, specs }) => {
+const ScoreMetaData = ({ classes, data }) => {
+  const { scores, specs } = data;
+
   return (
-    <React.Fragment>
-      {scores.map(score => {
-        <TableRow className={classes}>
-          <TableCell colSpan={2} numeric>
-            {score.name}
-          </TableCell>
-          <TableCell numeric>{score.time}</TableCell>
-          <TableCell numeric>{score.score}</TableCell>
-        </TableRow>;
+    <React.Fragment key={data.id + "-metadata"}>
+      {scores.map((score, index) => {
+        return (
+          <TableRow className={classes} key={index}>
+            <TableCell colSpan={2} numeric>
+              {score.name}
+            </TableCell>
+            <TableCell numeric>{score.time}</TableCell>
+            <TableCell numeric>{score.score}</TableCell>
+          </TableRow>
+        );
       })}
-      {specs.map(spec => {
-        <TableRow>
-          <TableCell>{spec.model}</TableCell>
-        </TableRow>;
-      })}
+      <TableRow key={specs.ID}>
+        <TableCell>{specs.specs.model}</TableCell>
+      </TableRow>
     </React.Fragment>
   );
 };
@@ -147,14 +149,13 @@ class Leaderboard extends Component {
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(data => {
-                      console.log(data);
-                      const isSelected = this.isSelected(data.ID);
+                      const isSelected = this.isSelected(data.id);
 
                       return (
-                        <React.Fragment key={data.ID}>
+                        <React.Fragment key={data.id}>
                           <TableRow
                             hover
-                            onClick={event => this.handleClick(event, data.ID)}
+                            onClick={event => this.handleClick(event, data.id)}
                             role="checkbox"
                             aria-checked={isSelected}
                             tabIndex={-1}
@@ -175,13 +176,11 @@ class Leaderboard extends Component {
                             <TableCell numeric>{data.totalTime}</TableCell>
                             <TableCell numeric>{data.totalScore}</TableCell>
                           </TableRow>
-                          {isSelected && (
-                            <ScoreMetaData
-                              classes={classes}
-                              scores={data.scores}
-                              specs={data.specs.specs}
-                            />
-                          )}
+                          {isSelected &&
+                            data.specs != null &&
+                            data.scores != null && (
+                              <ScoreMetaData classes={classes} data={data} />
+                            )}
                         </React.Fragment>
                       );
                     })}
