@@ -158,7 +158,7 @@ class Leaderboard extends Component {
                             data.scores.map(score => {
                               return (
                                 <TableRow className={classes}>
-                                  <TableCell colSpan={2} numeric>
+                                  <TableCell colSpan={3} numeric>
                                     {score.name}
                                   </TableCell>
                                   <TableCell numeric>{score.time}</TableCell>
@@ -168,8 +168,8 @@ class Leaderboard extends Component {
                             })}
                           {isSelected && data.specs != null && (
                             <TableRow className={classes}>
-                              <TableCell colSpan={4}>
-                                {data.specs.specs.overclocked}
+                              <TableCell colSpan={3}>
+                                {data.specs.specs}
                               </TableCell>
                             </TableRow>
                           )}
