@@ -17,29 +17,6 @@ import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
 import { getData, stableSort, getSorting } from "./data";
 
-const ScoreMetaData = ({ classes, data }) => {
-  const { scores, specs } = data;
-
-  return (
-    <React.Fragment key={data.id + "-metadata"}>
-      {scores.map((score, index) => {
-        return (
-          <TableRow className={classes} key={index}>
-            <TableCell colSpan={2} numeric>
-              {score.name}
-            </TableCell>
-            <TableCell numeric>{score.time}</TableCell>
-            <TableCell numeric>{score.score}</TableCell>
-          </TableRow>
-        );
-      })}
-      <TableRow key={specs.ID}>
-        <TableCell>{specs.specs.model}</TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-};
-
 const leaderboardStyles = theme => ({
   root: {
     maxWidth: "90vw",
@@ -177,10 +154,25 @@ class Leaderboard extends Component {
                             <TableCell numeric>{data.totalScore}</TableCell>
                           </TableRow>
                           {isSelected &&
-                            data.specs != null &&
-                            data.scores != null && (
-                              <ScoreMetaData classes={classes} data={data} />
-                            )}
+                            data.scores != null &&
+                            data.scores.map(score => {
+                              return (
+                                <TableRow className={classes}>
+                                  <TableCell colSpan={2} numeric>
+                                    {score.name}
+                                  </TableCell>
+                                  <TableCell numeric>{score.time}</TableCell>
+                                  <TableCell numeric>{score.score}</TableCell>
+                                </TableRow>
+                              );
+                            })}
+                          {isSelected && data.specs != null && (
+                            <TableRow className={classes}>
+                              <TableCell colSpan={4}>
+                                {data.specs.specs.overclocked}
+                              </TableCell>
+                            </TableRow>
+                          )}
                         </React.Fragment>
                       );
                     })}
