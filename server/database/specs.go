@@ -42,9 +42,9 @@ type SysInfo struct {
 	Threads     string `json:"threads"`      // number of physical CPU cores
 	Overclocked bool   `json:"overclocked"`  // specifies if the CPU is overclocked
 	ByteOrder   string `json:"byte_order"`   // CPU byte order
-	PhysicalMem string `json:"physical_mem"` // physical memory
-	VirtualMem  string `json:"virtual_mem"`  // virtual memory
-	SwapMem     string `json:"swap_mem"`     // swap memory
+	PhysicalMem string `json:"physical"` // physical memory
+	VirtualMem  string `json:"virtual"`  // virtual memory
+	SwapMem     string `json:"swap"`     // swap memory
 }
 
 // Value implements driver.Valuer.
