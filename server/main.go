@@ -43,6 +43,4 @@ func main() {
 
 	fmt.Println("Listening on https://localhost:443/")
 	log.Fatal(http.ListenAndServeTLS(addr, certFile, keyFile, handler))
-
-	// log.Fatal(http.ListenAndServe(":8080", handlers.Handler(db)))
 }

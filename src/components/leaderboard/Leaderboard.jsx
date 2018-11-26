@@ -17,6 +17,34 @@ import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
 import { getData, stableSort, getSorting } from "./data";
 
+const Metadata = ({ classes, specs }) => {
+  return (
+    <React.Fragment>
+      <TableRow classNames={classes}>
+        <TableCell colSpan={3} numeric>
+          Vendor: {specs.vendor}
+        </TableCell>
+        <TableCell numeric>Model: {specs.model}</TableCell>
+        <TableCell numeric>Clock Speed: {specs.speed}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell colSpan={3} numeric>
+          Threads: {specs.threads}
+        </TableCell>
+        <TableCell numeric>Overclocked: {String(specs.overclocked)}</TableCell>
+        <TableCell numeric>Byte Order: {specs.speed}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell colSpan={3} numeric>
+          Physical Memory: {specs.physical}
+        </TableCell>
+        <TableCell numeric>Virtual Memory: {specs.virtual}</TableCell>
+        <TableCell numeric>Swap Memory: {specs.swap}</TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+};
+
 const leaderboardStyles = theme => ({
   root: {
     maxWidth: "90vw",
@@ -166,15 +194,11 @@ class Leaderboard extends Component {
                                 </TableRow>
                               );
                             })}
-                          {isSelected && data.specs != null && data.specs.specs != null && (
-                            <TableRow className={classes}>
-                              <TableCell colSpan={5}>
-                                {data.specs.specs.vendor} {data.specs.specs.model} {data.specs.specs.speed}
-                                {data.specs.specs.threads} {data.specs.specs.overclocked} {data.specs.specs.byte_order}
-                                {data.specs.specs.physical_mem} {data.specs.specs.virtual_mem} {data.specs.specs.swap_mem}
-                              </TableCell>
-                            </TableRow>
-                          )}
+                          {isSelected &&
+                            data.specs != null &&
+                            data.specs.specs != null && (
+                              <Metadata specs={data.specs.specs} />
+                            )}
                         </React.Fragment>
                       );
                     })}
