@@ -73,6 +73,19 @@ class Download extends Component {
             </ListItem>
           </a>
         </List>
+        <Typography gutterBottom variant="subtitle1" component="h2">
+          Windows 32-bit
+        </Typography>
+        <List>
+          <a href="https://opensystembench.com/release/OpenSystemBenchWIN32.zip" download>
+            <ListItem>
+              <ListItemIcon>
+                <DownloadIcon />
+              </ListItemIcon>
+              <ListItemText>v1.0.0 .zip</ListItemText>
+            </ListItem>
+          </a>
+        </List>
       </Paper>
     );
   }
