@@ -17,16 +17,26 @@ import LeaderboardToolbar from "./LeaderboardToolbar";
 import LeaderboardPagination from "./LeaderboardPagination";
 import { getData, stableSort, getSorting } from "./data";
 
-// const ScoreMetaData = ({ classes, name, time, score }) => {
-//   return (
-//     <TableRow className={classes}>
-//       <TableCell colSpan={2} />
-//       <TableCell numeric>{name}</TableCell>
-//       <TableCell numeric>{time}</TableCell>
-//       <TableCell numeric>{score}</TableCell>
-//     </TableRow>
-//   );
-// };
+const ScoreMetaData = ({ classes, scores, specs }) => {
+  return (
+    <React.Fragment>
+      {scores.map(score => {
+        <TableRow className={classes}>
+          <TableCell colSpan={2} numeric>
+            {score.name}
+          </TableCell>
+          <TableCell numeric>{score.time}</TableCell>
+          <TableCell numeric>{score.score}</TableCell>
+        </TableRow>;
+      })}
+      {specs.map(spec => {
+        <TableRow>
+          <TableCell>{spec.model}</TableCell>
+        </TableRow>;
+      })}
+    </React.Fragment>
+  );
+};
 
 const leaderboardStyles = theme => ({
   root: {
@@ -137,6 +147,7 @@ class Leaderboard extends Component {
                   {stableSort(data, getSorting(order, orderBy))
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(data => {
+                      console.log(data);
                       const isSelected = this.isSelected(data.ID);
 
                       return (
@@ -164,6 +175,13 @@ class Leaderboard extends Component {
                             <TableCell numeric>{data.totalTime}</TableCell>
                             <TableCell numeric>{data.totalScore}</TableCell>
                           </TableRow>
+                          {isSelected && (
+                            <ScoreMetaData
+                              classes={classes}
+                              scores={data.scores}
+                              specs={data.specs}
+                            />
+                          )}
                         </React.Fragment>
                       );
                     })}
