@@ -12,6 +12,7 @@ import { secondaryListItems } from "./listItems";
 import Leaderboard from "../leaderboard/Leaderboard";
 import Register from "../registration/Register";
 import Download from "../download/Download";
+import About from "../about/About";
 import MenuBar from "./MenuBar";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
@@ -19,6 +20,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import InsertChartIcon from "@material-ui/icons/InsertChart";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import PersonAdd from "@material-ui/icons/PersonAdd";
+import InfoIcon from "@material-ui/icons/Info";
 
 import { Route, NavLink, HashRouter } from "react-router-dom";
 
@@ -145,7 +147,7 @@ class Dashboard extends Component {
               <Divider />
               <List>
                 <React.Fragment>
-                  <NavLink to="/">
+                  <NavLink to="/" style={{ textDecoration: 'none' }}>
                     <ListItem button>
                       <ListItemIcon>
                         <InsertChartIcon />
@@ -156,7 +158,7 @@ class Dashboard extends Component {
                       />
                     </ListItem>
                   </NavLink>
-                  <NavLink to="/downloads">
+                  <NavLink to="/downloads" style={{ textDecoration: 'none' }}>
                     <ListItem button>
                       <ListItemIcon>
                         <DownloadIcon />
@@ -167,7 +169,7 @@ class Dashboard extends Component {
                       />
                     </ListItem>
                   </NavLink>
-                  <NavLink to="/register">
+                  <NavLink to="/register" style={{ textDecoration: 'none' }}>
                     <ListItem button>
                       <ListItemIcon>
                         <PersonAdd />
@@ -175,6 +177,17 @@ class Dashboard extends Component {
                       <ListItemText
                         className={classes.menuText}
                         primary="Register"
+                      />
+                    </ListItem>
+                  </NavLink>
+                  <NavLink to="/about" style={{ textDecoration: 'none' }}>
+                    <ListItem button>
+                      <ListItemIcon>
+                        <InfoIcon />
+                      </ListItemIcon>
+                      <ListItemText
+                        className={classes.menuText}
+                        primary="About"
                       />
                     </ListItem>
                   </NavLink>
@@ -189,6 +202,7 @@ class Dashboard extends Component {
                 <Route exact path="/" component={Leaderboard} />
                 <Route path="/register" component={Register} />
                 <Route path="/downloads" component={Download} />
+		<Route path="/about" component={About} />
               </div>
             </main>
           </div>

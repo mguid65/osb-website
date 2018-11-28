@@ -39,7 +39,7 @@ const Metadata = ({ classes, specs }) => {
           <strong>Overclocked:</strong> {String(specs.overclocked)}
         </TableCell>
         <TableCell numeric>
-          <strong>Byte Order:</strong> {specs.speed}
+          <strong>Byte Order:</strong> {specs.byte_order}
         </TableCell>
       </TableRow>
       <TableRow>

@@ -9,6 +9,7 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
+import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
   root: {
@@ -28,6 +29,13 @@ const styles = theme => ({
   },
   title: {
     flex: "0 0 auto"
+  },
+  button: {
+    margin: theme.spacing.unit,
+    marginTop: theme.spacing.unit * 3,
+  },
+  info: {
+    marginLeft: theme.spacing.unit,
   }
 });
 
@@ -95,11 +103,11 @@ class Register extends Component {
               )
             }}
           />
-          <Button size="small" type="submit" className={classes.margin}>
+          <Button style={{ size: 'small', height: 40}} type="submit" variant="outlined" className={classes.button}>
             Register
           </Button>
         </form>
-        <Typography component="p">
+        <Typography component="p" className={classes.info}>
           Register an account with OpenSystemBench for score submission from our
           desktop clients.
         </Typography>

@@ -5,27 +5,17 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
-import { deepOrange500 } from "@material-ui/core/colors";
-import MuiThemeProvider from "@material-ui/core/styles/MuiThemeProvider";
-import { createMuiTheme } from "@material-ui/core/styles";
-
-const muiTheme = createMuiTheme({
-  palette: {
-    primary1color: deepOrange500
-  }
-});
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 
 const MenuBar = props => {
   const { classes, state, onClick } = props;
   return (
-    <MuiThemeProvider theme={muiTheme}>
       <AppBar
         position="absolute"
         className={classNames(
           classes.appBar,
           state.open && classes.appBarShift
         )}
-        color="primary"
       >
         <Toolbar disableGutters={!state.open} className={classes.toolbar}>
           <IconButton
@@ -40,7 +30,7 @@ const MenuBar = props => {
             <MenuIcon />
           </IconButton>
           <Typography
-            variant="title"
+            variant="h6"
             color="inherit"
             noWrap
             className={classes.title}
@@ -49,7 +39,6 @@ const MenuBar = props => {
           </Typography>
         </Toolbar>
       </AppBar>
-    </MuiThemeProvider>
   );
 };
 
