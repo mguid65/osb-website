@@ -2,6 +2,8 @@
 
 Repo for the [OpenSystemBench](https://github.com/mguid65/OpenSystemBench) website.
 
+Website down, Made public for archive purposes
+
 ## Development
 
 Run the following commands in separate terminals to run the website locally:
